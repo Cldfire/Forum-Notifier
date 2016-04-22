@@ -109,17 +109,17 @@ public class StatViewController {
 
             if (newMessagesCount > messagesCount) { // TODO: Get notifications to work when both a message and alert notification needs to be created
                 if (newMessagesCount - messagesCount == 1) {
-                    NotificationUtils.createNotification("Spigot Notifier", "You have a new message");
+                    NotificationUtils.createNotification("XenForo Notifier", "You have a new message");
                 } else {
-                    NotificationUtils.createNotification("Spigot Notifier", "You have " + (newMessagesCount - messagesCount) + " new messages");
+                    NotificationUtils.createNotification("XenForo Notifier", "You have " + (newMessagesCount - messagesCount) + " new messages");
                 }
             }
 
             if (newAlertsCount > alertsCount) {
                 if (newAlertsCount - alertsCount == 1) {
-                    NotificationUtils.createNotification("Spigot Notifier", "You have a new alert");
+                    NotificationUtils.createNotification("XenForo Notifier", "You have a new alert");
                 } else {
-                    NotificationUtils.createNotification("Spigot Notifier", "You have " + (newAlertsCount - alertsCount) + " new alerts");
+                    NotificationUtils.createNotification("XenForo Notifier", "You have " + (newAlertsCount - alertsCount) + " new alerts");
                 }
             }
 
