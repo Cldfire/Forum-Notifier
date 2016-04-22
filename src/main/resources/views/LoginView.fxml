@@ -9,8 +9,8 @@
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="500.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.cldfire.xenforonotifier.view.LoginViewController">
    <children>
       <TextField fx:id="username" layoutX="326.0" layoutY="218.0" promptText="username" />
-      <Button fx:id="loginButton" layoutX="375.0" layoutY="288.0" mnemonicParsing="false" onAction="#handleLogin" text="Log In" />
       <PasswordField fx:id="password" layoutX="326.0" layoutY="250.0" promptText="password" />
+      <Button fx:id="loginButton" layoutX="375.0" layoutY="288.0" mnemonicParsing="false" onAction="#handleLogin" text="Log In" />
       <TextField fx:id="authCode" layoutX="327.0" layoutY="218.0" promptText="code" visible="false" />
       <Button fx:id="confirmButton" layoutX="371.0" layoutY="288.0" mnemonicParsing="false" onAction="#handleTwoFactorAuthLogin" text="Confirm" visible="false" />
       <Label fx:id="incorrectLabel" layoutX="352.0" layoutY="194.0" text="Invalid credentials" textFill="RED" visible="false" />

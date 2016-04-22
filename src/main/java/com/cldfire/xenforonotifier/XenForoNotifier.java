@@ -14,7 +14,7 @@ import javafx.stage.Stage;
 
 import java.io.*;
 
-public class XenForoNotifier extends Application { // Project started April 1st, 2016 (Fools)
+public class XenForoNotifier extends Application { // Project started April 1st, 2016
 
     private Stage primaryStage;
     private BorderPane rootLayout;
@@ -64,6 +64,7 @@ public class XenForoNotifier extends Application { // Project started April 1st,
 
             LoginViewController controller = loader.getController();
             controller.setXenForoNotifier(this);
+            controller.username.requestFocus();
 
         } catch (IOException e) {
             e.printStackTrace();

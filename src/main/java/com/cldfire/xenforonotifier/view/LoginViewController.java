@@ -21,7 +21,7 @@ public class LoginViewController {
     // TODO: Re-write this to support multiple logins for checking multiple accounts / sites
 
     @FXML
-    private TextField username;
+    public TextField username;
     @FXML
     private PasswordField password;
     @FXML
