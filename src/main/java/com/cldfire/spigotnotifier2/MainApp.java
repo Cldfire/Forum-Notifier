@@ -26,7 +26,7 @@ public class MainApp extends Application { // Project started April 1st, 2016
     public void initRootLayout() {
         try {
             FXMLLoader loader = new FXMLLoader();
-            loader.setLocation(MainApp.class.getResource("view/RootLayout.fxml"));
+            loader.setLocation(this.getClass().getClassLoader().getResource("views/RootLayout.fxml"));
             rootLayout = loader.load();
 
             Scene scene = new Scene(rootLayout);
@@ -41,7 +41,7 @@ public class MainApp extends Application { // Project started April 1st, 2016
     public void showStatView() {
         try {
             FXMLLoader loader = new FXMLLoader();
-            loader.setLocation(MainApp.class.getResource("view/StatView.fxml"));
+            loader.setLocation(this.getClass().getClassLoader().getResource("views/StatView.fxml"));
             AnchorPane statView = loader.load();
 
             rootLayout.setCenter(statView);
@@ -55,7 +55,7 @@ public class MainApp extends Application { // Project started April 1st, 2016
         try {
             // Load login view
             FXMLLoader loader = new FXMLLoader();
-            loader.setLocation(MainApp.class.getResource("view/LoginView.fxml"));
+            loader.setLocation(this.getClass().getClassLoader().getResource("views/LoginView.fxml"));
             AnchorPane loginView = loader.load();
 
             // Set the stat view into the center of root layout.
