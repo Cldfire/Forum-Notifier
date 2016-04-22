@@ -18,6 +18,7 @@ public class XenForoNotifier extends Application { // Project started April 1st,
 
     private Stage primaryStage;
     private BorderPane rootLayout;
+    public static File APP_DIR;
 
     public static void main(String[] args) {
         launch(args);
@@ -71,6 +72,10 @@ public class XenForoNotifier extends Application { // Project started April 1st,
 
     @Override
     public void start(Stage primaryStage) {
+        APP_DIR = new File(System.getProperty("user.home"), ".spigotnotifier");
+        if (!APP_DIR.exists()) {
+            APP_DIR.mkdir();
+        }
         LangUtils.loadLocale(Locale.EN_US);
         PropertyUtils.loadSettings();
         this.primaryStage = primaryStage;

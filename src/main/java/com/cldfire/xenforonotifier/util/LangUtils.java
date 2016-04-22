@@ -1,12 +1,13 @@
 package com.cldfire.xenforonotifier.util;
 
+import com.cldfire.xenforonotifier.XenForoNotifier;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.util.Properties;
 
 public class LangUtils { // TODO: Clean this up, rushed it to get repo online
 
-    private static File APP_DIR;
     private static Properties properties;
 
     public enum Locale {
@@ -28,14 +29,10 @@ public class LangUtils { // TODO: Clean this up, rushed it to get repo online
     }
 
     public static void loadLocale(Locale locale) {
-        APP_DIR = new File(System.getProperty("user.home"), ".spigotnotifier");
-        if (!APP_DIR.exists()) {
-            APP_DIR.mkdir();
-        }
         properties = new Properties();
 
         try {
-            File file = new File(APP_DIR + "/lang", locale.getTag() + ".lang");
+            File file = new File(XenForoNotifier.APP_DIR + "/lang", locale.getTag() + ".lang");
             if (file.exists()) {
                 properties.load(new FileInputStream(file));
             }
