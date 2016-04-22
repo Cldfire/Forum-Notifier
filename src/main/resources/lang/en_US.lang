@@ -1,0 +1,9 @@
+window.title=XenForo Notifier
+login.username=username
+login.password=password
+login.button=Log in
+login.authCode=Code
+login.confirm=Confirm
+login.errorLabel=Invalid credentials
+login.errorLabel.authCode=Invalid code
+login.errorLabel.other=An error has occurred, please try again later

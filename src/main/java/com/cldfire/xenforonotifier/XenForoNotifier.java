@@ -1,10 +1,8 @@
 package com.cldfire.xenforonotifier;
 
 import com.cldfire.xenforonotifier.util.LangUtils;
-import com.cldfire.xenforonotifier.util.NotificationUtils;
-import com.cldfire.xenforonotifier.util.Settings;
 import com.cldfire.xenforonotifier.util.LangUtils.Locale;
-
+import com.cldfire.xenforonotifier.util.Settings;
 import com.cldfire.xenforonotifier.view.LoginViewController;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -13,7 +11,8 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
 
 public class XenForoNotifier extends Application { // Project started April 1st, 2016
 
@@ -66,6 +65,12 @@ public class XenForoNotifier extends Application { // Project started April 1st,
             LoginViewController controller = loader.getController();
             controller.setXenForoNotifier(this);
             controller.username.requestFocus();
+            controller.errorLabel.setText(LangUtils.translate("login.errorLabel"));
+            controller.username.setPromptText(LangUtils.translate("login.username"));
+            controller.password.setPromptText(LangUtils.translate("login.password"));
+            controller.loginButton.setText(LangUtils.translate("login.button"));
+            controller.authCode.setPromptText(LangUtils.translate("login.authCode"));
+            controller.confirmButton.setText(LangUtils.translate("login.confirm"));
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -74,12 +79,18 @@ public class XenForoNotifier extends Application { // Project started April 1st,
 
     @Override
     public void start(Stage primaryStage) {
-        APP_DIR = new File(System.getProperty("user.home"), ".spigotnotifier");
-        if (!APP_DIR.exists()) {
+        APP_DIR = new File(System.getProperty("user.home"), ".xenforonotifier");
+        if (!APP_DIR.exists()) { // Technically First Install
             APP_DIR.mkdir();
         }
-        LangUtils.loadLocale(Locale.EN_US);
+
         Settings.load();
+        LangUtils.loadLocale(Locale.valueOf(Settings.get("client.lang")));
+        System.out.println(Settings.version);
+        System.out.println(Settings.innerVersion);
+        System.out.println(Settings.innerVersion > Settings.version); // If true then add new Settings to their Settings.
+
+
         this.primaryStage = primaryStage;
         this.primaryStage.setTitle(LangUtils.translate("window.title"));
 

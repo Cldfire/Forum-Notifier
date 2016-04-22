@@ -1,0 +1,9 @@
+window.title=Taco Notifier
+login.username=taconame
+login.password=tacoword
+login.button=Taco in
+login.authCode=TaCode
+login.confirm=Tacofirm
+login.errorLabel=Invalid Tacos
+login.errorLabel.authCode=Taco CODE IZ WRON
+login.errorLabel.other=An error has occurred

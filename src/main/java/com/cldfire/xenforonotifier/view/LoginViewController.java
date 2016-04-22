@@ -1,6 +1,7 @@
 package com.cldfire.xenforonotifier.view;
 
 import com.cldfire.xenforonotifier.XenForoNotifier;
+import com.cldfire.xenforonotifier.util.LangUtils;
 import com.cldfire.xenforonotifier.util.Settings;
 import com.gargoylesoftware.htmlunit.BrowserVersion;
 import com.gargoylesoftware.htmlunit.WebClient;
@@ -23,15 +24,15 @@ public class LoginViewController {
     @FXML
     public TextField username;
     @FXML
-    private PasswordField password;
+    public PasswordField password;
     @FXML
-    private Button loginButton;
+    public Button loginButton;
     @FXML
-    private TextField authCode;
+    public TextField authCode;
     @FXML
-    private Button confirmButton;
+    public Button confirmButton;
     @FXML
-    private Label incorrectLabel;
+    public Label errorLabel;
 
     private XenForoNotifier xenForoNotifier;
     private static Set<Cookie> cookies;
@@ -48,10 +49,7 @@ public class LoginViewController {
     }
 
     private Boolean testForLoggedIn() {
-        if (webClient.getCookieManager().getCookie("xf_user") != null) {
-            return true;
-        }
-        return false;
+        return webClient.getCookieManager().getCookie("xf_user") != null;
     }
 
     private HtmlPage loginToSite(String url, String email, String password) {
@@ -115,15 +113,15 @@ public class LoginViewController {
     @FXML
     private void handleLogin() {
         Runnable loginRunnable = () -> { // TODO: Finalize error handling here, clean up where necessary
-            Platform.runLater(() -> incorrectLabel.setVisible(false));
+            Platform.runLater(() -> errorLabel.setVisible(false));
             final HtmlPage postLoginPage = loginToSite("https://" + Settings.get("website.baseurl") + "/login", username.getText(), password.getText());
 
             if (postLoginPage != null) {
-                if (postLoginPage.getUrl().toString().equals("https://" + Settings.get("website.baseurl") + "/login/two-step?redirect=https%3A%2F%2Fwww.spigotmc.org%2F&remember=1")) {
+                if (postLoginPage.getUrl().toString().startsWith("https://" + Settings.get("website.baseurl") + "/login/two-step")) {
                     password.setVisible(false);
                     username.setVisible(false);
                     loginButton.setVisible(false);
-                    incorrectLabel.setVisible(false);
+                    errorLabel.setVisible(false);
                     confirmButton.setVisible(true);
                     authCode.setVisible(true);
 
@@ -133,10 +131,12 @@ public class LoginViewController {
 
                 } else if (postLoginPage.getUrl().toString().equals("https://" + Settings.get("website.baseurl") + "/login/login")) {
                     Platform.runLater(() -> {
-                        incorrectLabel.setVisible(true);
+                        errorLabel.setVisible(true);
                         password.setText("");
-                        username.setText("");
                     });
+                } else {
+                    errorLabel.setText(LangUtils.translate("login.errorLabel.other"));
+                    errorLabel.setVisible(true);
                 }
             }
         };
@@ -146,7 +146,7 @@ public class LoginViewController {
     @FXML
     private void handleTwoFactorAuthLogin() {
         Runnable twoFactorRunnable = () -> { // TODO: Finalize error handling here
-            Platform.runLater(() -> incorrectLabel.setVisible(false));
+            Platform.runLater(() -> errorLabel.setVisible(false));
             final HtmlPage postLoginPage = loginTwoFactorAuth("https://" + Settings.get("website.baseurl") + "/login/two-step?redirect=https%3A%2F%2Fwww.spigotmc.org%2F&remember=1", authCode.getText());
 
             if (postLoginPage != null) {
@@ -155,15 +155,15 @@ public class LoginViewController {
                     Platform.runLater(() -> xenForoNotifier.showStatView());
                 } else {
                     Platform.runLater(() -> {
-                        incorrectLabel.setText("Invalid code");
-                        incorrectLabel.setVisible(true);
+                        errorLabel.setText(LangUtils.translate("login.errorLabel.authCode"));
+                        errorLabel.setVisible(true);
                         authCode.setText("");
                     });
                 }
             } else {
                 Platform.runLater(() -> {
-                    incorrectLabel.setText("Something went wrong");
-                    incorrectLabel.setVisible(true);
+                    errorLabel.setText(LangUtils.translate("login.errorLabel.other"));
+                    errorLabel.setVisible(true);
                 });
             }
         };
