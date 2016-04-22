@@ -6,7 +6,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.util.Properties;
 
-public class PropertyUtils { // TODO: Clean this up, rushed it to get repo online
+public class Settings { // TODO: Clean this up, rushed it to get repo online
 
     private static Properties properties;
 
@@ -18,7 +18,7 @@ public class PropertyUtils { // TODO: Clean this up, rushed it to get repo onlin
         properties.setProperty(key, value);
     }
 
-    public static void loadSettings() {
+    public static void load() {
         properties = new Properties();
 
         try {

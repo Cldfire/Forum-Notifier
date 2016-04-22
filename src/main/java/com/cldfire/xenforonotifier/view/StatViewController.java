@@ -1,7 +1,7 @@
 package com.cldfire.xenforonotifier.view;
 
 import com.cldfire.xenforonotifier.util.NotificationUtils;
-import com.cldfire.xenforonotifier.util.PropertyUtils;
+import com.cldfire.xenforonotifier.util.Settings;
 import com.gargoylesoftware.htmlunit.BrowserVersion;
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.html.HtmlDefinitionDescription;
@@ -103,7 +103,7 @@ public class StatViewController {
     private void checkEverythingAtFixedRate() {
         Runnable getEverythingRunnable = () -> {
             // TODO: Verify that returnedValues isn't null
-            final Map<String, String> returnedValues = new HashMap<>(getEverything("https://" + PropertyUtils.get("website.baseurl"), LoginViewController.getCookies()));
+            final Map<String, String> returnedValues = new HashMap<>(getEverything("https://" + Settings.get("website.baseurl"), LoginViewController.getCookies()));
             final Integer newMessagesCount = Integer.parseInt(returnedValues.get("messages"));
             final Integer newAlertsCount = Integer.parseInt(returnedValues.get("alerts"));
 

@@ -1,7 +1,8 @@
 package com.cldfire.xenforonotifier;
 
 import com.cldfire.xenforonotifier.util.LangUtils;
-import com.cldfire.xenforonotifier.util.PropertyUtils;
+import com.cldfire.xenforonotifier.util.NotificationUtils;
+import com.cldfire.xenforonotifier.util.Settings;
 import com.cldfire.xenforonotifier.util.LangUtils.Locale;
 
 import com.cldfire.xenforonotifier.view.LoginViewController;
@@ -78,11 +79,9 @@ public class XenForoNotifier extends Application { // Project started April 1st,
             APP_DIR.mkdir();
         }
         LangUtils.loadLocale(Locale.EN_US);
-        PropertyUtils.loadSettings();
+        Settings.load();
         this.primaryStage = primaryStage;
         this.primaryStage.setTitle(LangUtils.translate("window.title"));
-
-        System.out.println(System.getProperty("user.home"));
 
         initRootLayout();
         showLoginView();

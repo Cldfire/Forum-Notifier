@@ -1,7 +1,7 @@
 package com.cldfire.xenforonotifier.view;
 
 import com.cldfire.xenforonotifier.XenForoNotifier;
-import com.cldfire.xenforonotifier.util.PropertyUtils;
+import com.cldfire.xenforonotifier.util.Settings;
 import com.gargoylesoftware.htmlunit.BrowserVersion;
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.html.*;
@@ -57,9 +57,6 @@ public class LoginViewController {
     private HtmlPage loginToSite(String url, String email, String password) {
         webClient.getOptions().setCssEnabled(false);
         webClient.getOptions().setJavaScriptEnabled(false);
-
-        System.out.println(email);
-        System.out.println(password);
 
         HtmlPage page1;
         final HtmlForm loginForm;
@@ -119,10 +116,10 @@ public class LoginViewController {
     private void handleLogin() {
         Runnable loginRunnable = () -> { // TODO: Finalize error handling here, clean up where necessary
             Platform.runLater(() -> incorrectLabel.setVisible(false));
-            final HtmlPage postLoginPage = loginToSite("https://" + PropertyUtils.get("website.baseurl") + "/login", username.getText(), password.getText());
+            final HtmlPage postLoginPage = loginToSite("https://" + Settings.get("website.baseurl") + "/login", username.getText(), password.getText());
 
             if (postLoginPage != null) {
-                if (postLoginPage.getUrl().toString().equals("https://" + PropertyUtils.get("website.baseurl") + "/login/two-step?redirect=https%3A%2F%2Fwww.spigotmc.org%2F&remember=1")) {
+                if (postLoginPage.getUrl().toString().equals("https://" + Settings.get("website.baseurl") + "/login/two-step?redirect=https%3A%2F%2Fwww.spigotmc.org%2F&remember=1")) {
                     password.setVisible(false);
                     username.setVisible(false);
                     loginButton.setVisible(false);
@@ -130,11 +127,11 @@ public class LoginViewController {
                     confirmButton.setVisible(true);
                     authCode.setVisible(true);
 
-                } else if (postLoginPage.getUrl().toString().equals("https://" + PropertyUtils.get("website.baseurl"))) {
+                } else if (testForLoggedIn()) {
                     cookies = webClient.getCookieManager().getCookies();
                     Platform.runLater(() -> xenForoNotifier.showStatView());
 
-                } else if (postLoginPage.getUrl().toString().equals("https://" + PropertyUtils.get("website.baseurl") + "/login/login")) {
+                } else if (postLoginPage.getUrl().toString().equals("https://" + Settings.get("website.baseurl") + "/login/login")) {
                     Platform.runLater(() -> {
                         incorrectLabel.setVisible(true);
                         password.setText("");
@@ -150,7 +147,7 @@ public class LoginViewController {
     private void handleTwoFactorAuthLogin() {
         Runnable twoFactorRunnable = () -> { // TODO: Finalize error handling here
             Platform.runLater(() -> incorrectLabel.setVisible(false));
-            final HtmlPage postLoginPage = loginTwoFactorAuth("https://" + PropertyUtils.get("website.baseurl") + "/login/two-step?redirect=https%3A%2F%2Fwww.spigotmc.org%2F&remember=1", authCode.getText());
+            final HtmlPage postLoginPage = loginTwoFactorAuth("https://" + Settings.get("website.baseurl") + "/login/two-step?redirect=https%3A%2F%2Fwww.spigotmc.org%2F&remember=1", authCode.getText());
 
             if (postLoginPage != null) {
                 if (testForLoggedIn()) {
