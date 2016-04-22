@@ -14,7 +14,7 @@ import javafx.stage.Stage;
 
 import java.io.*;
 
-public class XenForoNotifier extends Application { // Project started April 1st, 2016
+public class XenForoNotifier extends Application { // Project started April 1st, 2016 (Fools)
 
     private Stage primaryStage;
     private BorderPane rootLayout;
