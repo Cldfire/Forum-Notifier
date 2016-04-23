@@ -64,13 +64,6 @@ public class XenForoNotifier extends Application { // Project started April 1st,
 
             LoginViewController controller = loader.getController();
             controller.setXenForoNotifier(this);
-            controller.username.requestFocus();
-            controller.errorLabel.setText(LangUtils.translate("login.errorLabel"));
-            controller.username.setPromptText(LangUtils.translate("login.username"));
-            controller.password.setPromptText(LangUtils.translate("login.password"));
-            controller.loginButton.setText(LangUtils.translate("login.button"));
-            controller.authCode.setPromptText(LangUtils.translate("login.authCode"));
-            controller.confirmButton.setText(LangUtils.translate("login.confirm"));
 
         } catch (IOException e) {
             e.printStackTrace();

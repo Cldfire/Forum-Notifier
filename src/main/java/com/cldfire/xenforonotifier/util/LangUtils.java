@@ -13,15 +13,20 @@ public class LangUtils { // TODO: Clean this up, rushed it to get repo online
     private static Properties properties;
 
     public enum Locale {
-        EN_TA("en_TA"),
-        EN_US("en_US"); // Add more
+        EN_US("en_US", "English (US)"),
+        EN_TA("en_TA", "Taco"); // Add more
 
         private final String tag;
-        Locale(String tag) {
+        private final String name;
+        Locale(String tag, String name) {
             this.tag = tag;
+            this.name = name;
         }
         public String getTag() {
             return this.tag;
+        }
+        public String getName() {
+            return this.name;
         }
     }
 

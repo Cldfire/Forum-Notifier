@@ -40,6 +40,16 @@ public class LoginViewController {
     private final WebClient webClient = new WebClient(BrowserVersion.CHROME);
     private final ExecutorService executor = Executors.newFixedThreadPool(1);
 
+    public void initialize() {
+        username.requestFocus();
+        errorLabel.setText(LangUtils.translate("login.errorLabel"));
+        username.setPromptText(LangUtils.translate("login.username"));
+        password.setPromptText(LangUtils.translate("login.password"));
+        loginButton.setText(LangUtils.translate("login.button"));
+        authCode.setPromptText(LangUtils.translate("login.authCode"));
+        confirmButton.setText(LangUtils.translate("login.confirm"));
+    }
+
     public static Set<Cookie> getCookies() {
         return cookies;
     }
