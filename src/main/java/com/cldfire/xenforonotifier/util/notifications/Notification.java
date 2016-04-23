@@ -144,7 +144,7 @@ public class Notification {
             return this;
         }
 
-        public NotificationBuilder image(EnumImageType type) {
+        public NotificationBuilder imageType(EnumImageType type) {
             this.imageType = type;
             return this;
         }
