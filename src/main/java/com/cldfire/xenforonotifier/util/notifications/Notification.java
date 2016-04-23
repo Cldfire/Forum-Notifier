@@ -1,9 +1,6 @@
 package com.cldfire.xenforonotifier.util.notifications;
 
 import javafx.animation.Animation;
-import javafx.embed.swing.SwingFXUtils;
-
-import java.awt.image.BufferedImage;
 
 /**
  * Represents a notification
@@ -11,7 +8,7 @@ import java.awt.image.BufferedImage;
 public class Notification {
     private final String title;
     private final String subtitle;
-    private final BufferedImage image;
+    private final EnumImageType imageType;
     private final Animation animation;
 
     /**
@@ -37,10 +34,10 @@ public class Notification {
      * Creates a new notification
      *
      * @param title this notification's title
-     * @param image this notification's image
+     * @param type  this notification's image type
      */
-    public Notification(String title, BufferedImage image) {
-        this(title, null, image, null);
+    public Notification(String title, EnumImageType type) {
+        this(title, null, type, null);
     }
 
     /**
@@ -48,10 +45,10 @@ public class Notification {
      *
      * @param title    this notification's title
      * @param subtitle this notification's subtitle
-     * @param image    this notification's image
+     * @param type     this notification's image type
      */
-    public Notification(String title, String subtitle, BufferedImage image) {
-        this(title, subtitle, image, null);
+    public Notification(String title, String subtitle, EnumImageType type) {
+        this(title, subtitle, type, null);
     }
 
     /**
@@ -59,13 +56,13 @@ public class Notification {
      *
      * @param title     this notification's title
      * @param subtitle  this notification's subtitle
-     * @param image     this notification's image
+     * @param type      this notification's image type
      * @param animation this notification's animation
      */
-    public Notification(String title, String subtitle, BufferedImage image, Animation animation) {
+    public Notification(String title, String subtitle, EnumImageType type, Animation animation) {
         this.title = title;
         this.subtitle = subtitle;
-        this.image = image;
+        this.imageType = type;
         this.animation = animation;
     }
 
@@ -77,7 +74,7 @@ public class Notification {
     public Notification(NotificationBuilder builder) {
         this.title = builder.title;
         this.subtitle = builder.subtitle;
-        this.image = builder.image;
+        this.imageType = builder.imageType;
         this.animation = builder.animation;
     }
 
@@ -114,21 +111,12 @@ public class Notification {
     }
 
     /**
-     * Gets the image associated with this notification
+     * Gets the image type associated with this notification
      *
-     * @return the AWT image for this notification
+     * @return the type of image for this notification
      */
-    public BufferedImage getAWTImage() {
-        return this.image;
-    }
-
-    /**
-     * Gets the image associated with this notification
-     *
-     * @return the FX image for this notification
-     */
-    public javafx.scene.image.Image getFXImage() {
-        return SwingFXUtils.toFXImage(this.getAWTImage(), null);
+    public EnumImageType getImageType() {
+        return this.imageType;
     }
 
     /**
@@ -143,7 +131,7 @@ public class Notification {
     public static class NotificationBuilder {
         private String title;
         private String subtitle;
-        private BufferedImage image;
+        private EnumImageType imageType;
         private Animation animation;
 
         public NotificationBuilder title(String title) {
@@ -156,8 +144,8 @@ public class Notification {
             return this;
         }
 
-        public NotificationBuilder image(BufferedImage image) {
-            this.image = image;
+        public NotificationBuilder image(EnumImageType type) {
+            this.imageType = type;
             return this;
         }
 

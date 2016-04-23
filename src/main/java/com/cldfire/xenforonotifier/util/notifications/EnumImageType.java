@@ -3,15 +3,15 @@ package com.cldfire.xenforonotifier.util.notifications;
 /**
  * A class of image enums
  */
-public enum EnumImage {
-    ALERT_BELL("images/notification-bell.png");
+public enum EnumImageType {
+    ALERT("images/notification-bell.png");
 
     private final String path;
 
     /**
      * @param path path to the image
      */
-    EnumImage(final String path) {
+    EnumImageType(final String path) {
         this.path = path;
     }
 

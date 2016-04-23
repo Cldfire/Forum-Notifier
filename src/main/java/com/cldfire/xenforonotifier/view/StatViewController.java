@@ -1,8 +1,7 @@
 package com.cldfire.xenforonotifier.view;
 
-import com.cldfire.xenforonotifier.util.notifications.EnumImage;
+import com.cldfire.xenforonotifier.util.notifications.EnumImageType;
 import com.cldfire.xenforonotifier.util.notifications.Notification;
-import com.cldfire.xenforonotifier.util.notifications.NotificationUtils;
 import com.cldfire.xenforonotifier.util.Settings;
 import com.gargoylesoftware.htmlunit.BrowserVersion;
 import com.gargoylesoftware.htmlunit.WebClient;
@@ -15,7 +14,6 @@ import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 
-import java.awt.image.BufferedImage;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -109,21 +107,20 @@ public class StatViewController {
             final Map<String, String> returnedValues = new HashMap<>(getEverything("https://" + Settings.get("website.baseurl"), LoginViewController.getCookies()));
             final Integer newMessagesCount = Integer.parseInt(returnedValues.get("messages"));
             final Integer newAlertsCount = Integer.parseInt(returnedValues.get("alerts"));
-            BufferedImage notifImage = NotificationUtils.imageFromPath(EnumImage.ALERT_BELL);
 
             if (newMessagesCount > messagesCount) { // TODO: Get notifications to work when both a message and alert notification needs to be created
                 if (newMessagesCount - messagesCount == 1) {
-                    new Notification("XenForo Notifier", "You have a new message", notifImage).send();
+                    new Notification("XenForo Notifier", "You have a new message", EnumImageType.ALERT).send();
                 } else {
-                    new Notification("XenForo Notifier", "You have " + (newMessagesCount - messagesCount) + " new messages", notifImage).send();
+                    new Notification("XenForo Notifier", "You have " + (newMessagesCount - messagesCount) + " new messages", EnumImageType.ALERT).send();
                 }
             }
 
             if (newAlertsCount > alertsCount) {
                 if (newAlertsCount - alertsCount == 1) {
-                    new Notification("XenForo Notifier", "You have a new alert", notifImage).send();
+                    new Notification("XenForo Notifier", "You have a new alert", EnumImageType.ALERT).send();
                 } else {
-                    new Notification("XenForo Notifier", "You have " + (newAlertsCount - alertsCount) + " new alerts", notifImage).send();
+                    new Notification("XenForo Notifier", "You have " + (newAlertsCount - alertsCount) + " new alerts", EnumImageType.ALERT).send();
                 }
             }
 

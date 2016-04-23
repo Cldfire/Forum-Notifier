@@ -4,6 +4,8 @@ import com.cldfire.xenforonotifier.XenForoNotifier;
 import com.cldfire.xenforonotifier.util.LangUtils;
 import com.github.plushaze.traynotification.animations.Animations;
 import com.github.plushaze.traynotification.notification.TrayNotification;
+import javafx.embed.swing.SwingFXUtils;
+import javafx.scene.image.Image;
 import javafx.util.Duration;
 import org.apache.commons.lang3.SystemUtils;
 
@@ -19,13 +21,13 @@ public class NotificationUtils {
     private static TrayIcon trayIcon;
 
     /**
-     * Helper to get a Buffered image from an EnumImage
+     * Helper to get a Buffered image from an EnumImageType
      *
-     * @param enumImage enum for path
+     * @param enumImageType enum for path
      * @return BufferedImage from specified path
      */
-    public static BufferedImage imageFromPath(EnumImage enumImage) {
-        URL urlToImage = XenForoNotifier.class.getClassLoader().getResource(enumImage.toString());
+    private static BufferedImage awtImageFromEnum(EnumImageType enumImageType) {
+        URL urlToImage = XenForoNotifier.class.getClassLoader().getResource(enumImageType.toString());
         if (urlToImage == null) {
             throw new IllegalArgumentException("URL to Image cannot be null! Check your path!");
         }
@@ -38,6 +40,26 @@ public class NotificationUtils {
         }
 
         return image;
+    }
+
+    /**
+     * Helper to get FX images from BufferedImages
+     *
+     * @param image BufferedImage to convert
+     * @return JavaFX Image
+     */
+    private static javafx.scene.image.Image fxImageFromAWTImage(BufferedImage image) {
+        return SwingFXUtils.toFXImage(image, null);
+    }
+
+    /**
+     * Helper to get a Buffered image from an EnumImageType
+     *
+     * @param enumImageType enum for path
+     * @return BufferedImage from specified path
+     */
+    private static Image fxImageFromEnum(EnumImageType enumImageType) {
+        return fxImageFromAWTImage(awtImageFromEnum(enumImageType));
     }
 
     /**
@@ -83,7 +105,7 @@ public class NotificationUtils {
             tray.setTitle(notification.getTitle());
             tray.setMessage(notification.getSubtitle());
             tray.setAnimation(Animations.POPUP); // TODO: How are we standardizing animations (if at all)
-            tray.setImage(notification.getFXImage());
+            tray.setImage(fxImageFromEnum(notification.getImageType()));
             tray.showAndDismiss(Duration.seconds(4));
         } catch (Exception e) {
             e.printStackTrace();
@@ -91,7 +113,7 @@ public class NotificationUtils {
     }
 
     private static void sendWindowsNotification(Notification notification) {
-        trayIcon = new TrayIcon(notification.getAWTImage(), LangUtils.translate(notification.getTitle()));
+        trayIcon = new TrayIcon(awtImageFromEnum(notification.getImageType()), LangUtils.translate(notification.getTitle()));
         trayIcon.setImageAutoSize(true);
         if (SystemTray.isSupported()) {
             if (!trayIconExists()) { // make sure we don't duplicate it / cause an error
