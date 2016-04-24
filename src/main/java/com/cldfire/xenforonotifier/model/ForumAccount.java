@@ -4,9 +4,6 @@ import com.cldfire.xenforonotifier.util.Settings;
 import com.gargoylesoftware.htmlunit.util.Cookie;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
-
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.Set;
 
 public class ForumAccount { // TODO: Make sure all this becomes thread-safe at some point or another
@@ -24,9 +21,13 @@ public class ForumAccount { // TODO: Make sure all this becomes thread-safe at s
         this.name = new SimpleStringProperty(name);
         this.connProtocol = connProtocol;
 
-        Settings.set(forumUrl, forumUrl);
-        Settings.set(forumUrl + ".profilename", name);
-        Settings.set(forumUrl + ".protocol", connProtocol);
+        try {
+            Settings.set(forumUrl, forumUrl);
+            Settings.set(forumUrl + ".profilename", name);
+            Settings.set(forumUrl + ".protocol", connProtocol);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public String getForumUrl() {

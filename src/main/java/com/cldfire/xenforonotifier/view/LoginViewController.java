@@ -219,7 +219,7 @@ public class LoginViewController {
                         System.out.println("Arraylist already existed");
                         ArrayList<ForumAccount> addAccounts = new ArrayList<>();
                         accounts.get(url.getText()).forEach(c -> addAccounts.add(c));
-                        addAccounts.add(new ForumAccount(url.getText(), webClient.getCookieManager().getCookies(), getAccountName(tempConnProtocol + "://" + url.getText()), tempConnProtocol)); // TODO: Make sure this uses correct protocol
+                        addAccounts.add(new ForumAccount(url.getText(), webClient.getCookieManager().getCookies(), getAccountName(tempConnProtocol + "://" + url.getText()), tempConnProtocol));
 
                         accounts.replace(url.getText(), addAccounts);
                     }
