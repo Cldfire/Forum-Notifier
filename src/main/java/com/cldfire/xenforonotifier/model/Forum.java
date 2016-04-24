@@ -6,7 +6,7 @@ import java.util.List;
 public class Forum {
     private String forum;
     private String protocol;
-    private List<Account> accounts = new ArrayList<Account>();
+    private List<Account> accounts = new ArrayList<>();
 
     public Forum(String forum) {
         this.forum = forum;
