@@ -1,5 +1,6 @@
 package com.cldfire.xenforonotifier.view;
 
+import com.cldfire.xenforonotifier.model.ForumAccount;
 import com.cldfire.xenforonotifier.util.notifications.EnumImageType;
 import com.cldfire.xenforonotifier.util.notifications.Notification;
 import com.cldfire.xenforonotifier.util.Settings;
@@ -14,6 +15,7 @@ import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -31,11 +33,7 @@ public class StatViewController {
     @FXML
     private Label postCountField;
 
-    private final ExecutorService executor = Executors.newFixedThreadPool(1);
     private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
-
-    private Integer messagesCount = 0;
-    private Integer alertsCount = 0;
 
     @FXML
     private void initialize() {
@@ -101,41 +99,46 @@ public class StatViewController {
         return null;
     }
 
-    private void checkEverythingAtFixedRate() {
+    private void checkEverythingAtFixedRate() { // TODO: I'm very aware this is not going to thread properly atm, will fix in the future
         Runnable getEverythingRunnable = () -> {
-            // TODO: Verify that returnedValues isn't null
-            final Map<String, String> returnedValues = new HashMap<>(getEverything("https://" + Settings.get("website.baseurl"), LoginViewController.getCookies()));
-            final Integer newMessagesCount = Integer.parseInt(returnedValues.get("messages"));
-            final Integer newAlertsCount = Integer.parseInt(returnedValues.get("alerts"));
+            LoginViewController.websiteList.forEach(u -> {
+                System.out.println("Website list had something");
+                ArrayList<ForumAccount> siteAccounts = new ArrayList<>(LoginViewController.accounts.get(u));
 
-            if (newMessagesCount > messagesCount) { // TODO: Get notifications to work when both a message and alert notification needs to be created
-                if (newMessagesCount - messagesCount == 1) {
-                    new Notification("XenForo Notifier", "You have a new message", EnumImageType.ALERT).send();
-                } else {
-                    new Notification("XenForo Notifier", "You have " + (newMessagesCount - messagesCount) + " new messages", EnumImageType.ALERT).send();
-                }
-            }
+                siteAccounts.forEach(a -> {
+                    System.out.println("There were accounts for that site");
+                    System.out.println(a.getName());
+                    // TODO: Verify that returnedValues isn't null
+                    final Map<String, String> returnedValues = new HashMap<>(getEverything("https://" + a.getForumUrl(), a.getCookies()));
+                    final Integer newMessagesCount = Integer.parseInt(returnedValues.get("messages"));
+                    final Integer newAlertsCount = Integer.parseInt(returnedValues.get("alerts"));
 
-            if (newAlertsCount > alertsCount) {
-                if (newAlertsCount - alertsCount == 1) {
-                    new Notification("XenForo Notifier", "You have a new alert", EnumImageType.ALERT).send();
-                } else {
-                    new Notification("XenForo Notifier", "You have " + (newAlertsCount - alertsCount) + " new alerts", EnumImageType.ALERT).send();
-                }
-            }
+                    if (newMessagesCount > a.getMessageCount()) { // TODO: Get notifications to work when both a message and alert notification needs to be created
+                        if (newMessagesCount - a.getMessageCount() == 1) {
+                            new Notification("XenForo Notifier", "You have a new message", EnumImageType.ALERT).send();
+                        } else {
+                            new Notification("XenForo Notifier", "You have " + (newMessagesCount - a.getMessageCount()) + " new messages", EnumImageType.ALERT).send();
+                        }
+                    }
 
-            messagesCount = newMessagesCount;
-            alertsCount = newAlertsCount;
+                    if (newAlertsCount > a.getAlertCount()) {
+                        if (newAlertsCount - a.getAlertCount() == 1) {
+                            new Notification("XenForo Notifier", "You have a new alert", EnumImageType.ALERT).send();
+                        } else {
+                            new Notification("XenForo Notifier", "You have " + (newAlertsCount - a.getAlertCount()) + " new alerts", EnumImageType.ALERT).send();
+                        }
+                    }
 
-            Platform.runLater(() -> {
-                try {
-                    newMessagesField.setText(returnedValues.get("messages"));
-                    newAlertsField.setText(returnedValues.get("alerts"));
-                    ratingField.setText(returnedValues.get("ratings"));
-                    postCountField.setText(returnedValues.get("posts"));
-                } catch(Exception e) {
-                    // TODO: returnedValues must have been null, show some sorta error message here
-                }
+                    a.setMessageCount(newMessagesCount);
+                    a.setAlertCount(newMessagesCount);
+
+                    Platform.runLater(() -> { // TODO: Get UI to support multiple accounts
+                        newMessagesField.setText(returnedValues.get("messages"));
+                        newAlertsField.setText(returnedValues.get("alerts"));
+                        ratingField.setText(returnedValues.get("ratings"));
+                        postCountField.setText(returnedValues.get("posts"));
+                    });
+                });
             });
             System.out.println("Ran checker");
         };

@@ -5,11 +5,11 @@ import com.gargoylesoftware.htmlunit.util.Cookie;
 import java.io.*;
 import java.util.Set;
 
-public class CookieUtils { // TODO: Actually finish / use these
+public class CookieUtils { // TODO: Use these
 
-    public Set<Cookie> loadCookiesFromFile(String filepath) {
+    public Set<Cookie> loadCookiesFromFile(String filename) {
         try {
-            ObjectInputStream cookieLoader = new ObjectInputStream(new FileInputStream(filepath));
+            ObjectInputStream cookieLoader = new ObjectInputStream(new FileInputStream(System.getProperty("user.home") + ".xenforonotifier/cookies/" + filename));
             cookieLoader.close();
             return (Set<Cookie>) cookieLoader.readObject();
         } catch(Exception e) {
@@ -18,12 +18,12 @@ public class CookieUtils { // TODO: Actually finish / use these
         return null;
     }
 
-    public void saveCookiesToFile(String filepath, Set<Cookie> cookies) {
+    public void saveCookiesToFile(String filename, Set<Cookie> cookies) {
         try {
-            ObjectOutput cookieSaver = new ObjectOutputStream(new FileOutputStream(filepath));
+            ObjectOutput cookieSaver = new ObjectOutputStream(new FileOutputStream(System.getProperty("user.home") + ".xenforonotifier/cookies/" + filename));
             cookieSaver.writeObject(cookies);
             cookieSaver.close();
-        } catch(Exception e) {
+        } catch(IOException e) {
             e.printStackTrace();
         }
     }

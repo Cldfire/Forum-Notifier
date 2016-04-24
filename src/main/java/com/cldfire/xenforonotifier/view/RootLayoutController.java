@@ -30,7 +30,7 @@ public class RootLayoutController {
             for (MenuItem menuItem : language.getItems()) {
                 RadioMenuItem radioMenuItem = ((RadioMenuItem) menuItem);
                 if (radioMenuItem.isSelected()) {
-                    LangUtils.loadLocale(LangUtils.Locale.valueOf(radioMenuItem.getId()));
+                    LangUtils.loadLocale(LangUtils.Locale.valueOf(radioMenuItem.getId())); // TODO: Reload all UI text, messages, etc. when language is changed
                 }
             }
         });

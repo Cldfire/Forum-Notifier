@@ -5,7 +5,7 @@ import com.cldfire.xenforonotifier.XenForoNotifier;
 import java.io.*;
 import java.util.Properties;
 
-public class Settings { // TODO: Clean this up, rushed it to get repo online
+public class Settings { // TODO: Clean this up
 
     private static Properties properties;
     public static double version;
@@ -66,7 +66,7 @@ public class Settings { // TODO: Clean this up, rushed it to get repo online
         }
     }
 
-    public static void save() {
+    public static void save() { // TODO: Use this
         try {
             FileOutputStream fileOutputStream = new FileOutputStream(new File(XenForoNotifier.APP_DIR, "settings.properties"));
             properties.store(fileOutputStream, "XenForo Notifier");
