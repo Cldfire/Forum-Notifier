@@ -1,34 +1,28 @@
 package com.cldfire.xenforonotifier.util.notifications;
 
-import javafx.animation.Animation;
-
 /**
  * Represents a notification
  */
 public class Notification {
+    /**
+     * Title for this notification
+     */
     private final String title;
+
+    /**
+     * Subtitle for this notification
+     */
     private final String subtitle;
+
+    /**
+     * Type of image associated with this notification
+     */
     private final EnumImageType imageType;
-    private final Animation animation;
 
     /**
-     * Creates a new notification
-     *
-     * @param title this notification's title
+     * Delay (in seconds) this notification will be shown for
      */
-    public Notification(String title) {
-        this(title, null, null, null);
-    }
-
-    /**
-     * Creates a new notification
-     *
-     * @param title    this notification's title
-     * @param subtitle this notification's subtitle
-     */
-    public Notification(String title, String subtitle) {
-        this(title, subtitle, null, null);
-    }
+    private final int delay;
 
     /**
      * Creates a new notification
@@ -37,7 +31,7 @@ public class Notification {
      * @param type  this notification's image type
      */
     public Notification(String title, EnumImageType type) {
-        this(title, null, type, null);
+        this(title, null, type);
     }
 
     /**
@@ -48,22 +42,22 @@ public class Notification {
      * @param type     this notification's image type
      */
     public Notification(String title, String subtitle, EnumImageType type) {
-        this(title, subtitle, type, null);
+        this(title, subtitle, type, 4); // 4 second default delay time if unspecified
     }
 
     /**
      * Creates a new notification
      *
-     * @param title     this notification's title
-     * @param subtitle  this notification's subtitle
-     * @param type      this notification's image type
-     * @param animation this notification's animation
+     * @param title    this notification's title
+     * @param subtitle this notification's subtitle
+     * @param type     this notification's image type
+     * @param delay    this notification's delay
      */
-    public Notification(String title, String subtitle, EnumImageType type, Animation animation) {
+    public Notification(String title, String subtitle, EnumImageType type, int delay) {
         this.title = title;
         this.subtitle = subtitle;
         this.imageType = type;
-        this.animation = animation;
+        this.delay = delay;
     }
 
     /**
@@ -75,7 +69,7 @@ public class Notification {
         this.title = builder.title;
         this.subtitle = builder.subtitle;
         this.imageType = builder.imageType;
-        this.animation = builder.animation;
+        this.delay = builder.delay;
     }
 
     /**
@@ -120,19 +114,20 @@ public class Notification {
     }
 
     /**
-     * Gets the animation associated with this notification
+     * Gets the delay associated with this notification
+     * IE how long will this notification be shown on the user's screen
      *
-     * @return the animation for this notification
+     * @return the delay for this notification
      */
-    public Animation getAnimation() { // TODO: How are we (are we?) standardizing animations?
-        return this.animation;
+    public int getDelay() {
+        return this.delay;
     }
 
     public static class NotificationBuilder {
         private String title;
         private String subtitle;
         private EnumImageType imageType;
-        private Animation animation;
+        private int delay;
 
         public NotificationBuilder title(String title) {
             this.title = title;
@@ -149,8 +144,8 @@ public class Notification {
             return this;
         }
 
-        public NotificationBuilder animation(Animation animation) {
-            this.animation = animation;
+        public NotificationBuilder delay(int delay) {
+            this.delay = delay;
             return this;
         }
 

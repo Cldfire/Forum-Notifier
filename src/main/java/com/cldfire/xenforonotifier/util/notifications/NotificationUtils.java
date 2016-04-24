@@ -13,12 +13,13 @@ import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.TrayIcon.MessageType;
 import java.awt.image.BufferedImage;
-import java.io.IOException;
+import java.io.*;
 import java.net.URL;
+import java.util.Date;
 
-public class NotificationUtils {
+class NotificationUtils {
     private static Environment environment;
-    private static TrayIcon trayIcon;
+    private static TrayIcon WINDOWS_trayIcon;
 
     /**
      * Helper to get a Buffered image from an EnumImageType
@@ -53,7 +54,7 @@ public class NotificationUtils {
     }
 
     /**
-     * Helper to get a Buffered image from an EnumImageType
+     * Helper to get an FX Image from an EnumImageType
      *
      * @param enumImageType enum for path
      * @return BufferedImage from specified path
@@ -95,41 +96,68 @@ public class NotificationUtils {
     }
 
     private static void sendLinuxNotification(Notification notification) {
-        sendOtherNotification(notification); // TODO: LINUX
+        /**
+         * Because we're going to be using a distro-specific binary to accomplish native-ish notifications
+         * check to make sure it exists, and if it doesn't use our generic system instead
+         */
+        File notifyBin = new File("/usr/bin/notify-send");
+        if (!notifyBin.exists() || notifyBin.isDirectory()) {
+            sendOtherNotification(notification);
+            return; // Bail out
+        }
+
+        String path = copyResourceToTemp(notification);
+        if (path == null) {
+            sendOtherNotification(notification);
+            return; // Bail out
+        }
+
+        String[] cmd = {"/usr/bin/notify-send",
+                "-t",
+                String.valueOf(notification.getDelay() * 1000),
+                String.valueOf(notification.getTitle()),
+                String.valueOf(notification.getSubtitle()),
+                "-i",
+                path};
+        try {
+            Runtime.getRuntime().exec(cmd);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private static void sendOtherNotification(Notification notification) {
         try {
             TrayNotification tray = new TrayNotification();
 
-            tray.setTitle(notification.getTitle());
-            tray.setMessage(notification.getSubtitle());
-            tray.setAnimation(Animations.POPUP); // TODO: How are we standardizing animations (if at all)
+            tray.setTitle(String.valueOf(notification.getTitle()));
+            tray.setMessage(String.valueOf(notification.getSubtitle()));
+            tray.setAnimation(Animations.POPUP);
             tray.setImage(fxImageFromEnum(notification.getImageType()));
-            tray.showAndDismiss(Duration.seconds(4));
+            tray.showAndDismiss(Duration.seconds(notification.getDelay()));
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
     private static void sendWindowsNotification(Notification notification) {
-        trayIcon = new TrayIcon(awtImageFromEnum(notification.getImageType()), LangUtils.translate(notification.getTitle()));
-        trayIcon.setImageAutoSize(true);
+        WINDOWS_trayIcon = new TrayIcon(awtImageFromEnum(notification.getImageType()), LangUtils.translate(notification.getTitle()));
+        WINDOWS_trayIcon.setImageAutoSize(true);
         if (SystemTray.isSupported()) {
             if (!trayIconExists()) { // make sure we don't duplicate it / cause an error
                 try {
-                    SystemTray.getSystemTray().add(trayIcon);
+                    SystemTray.getSystemTray().add(WINDOWS_trayIcon);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
-            trayIcon.displayMessage(notification.getTitle(), notification.getSubtitle(), MessageType.NONE);
+            WINDOWS_trayIcon.displayMessage(String.valueOf(notification.getTitle()), String.valueOf(notification.getSubtitle()), MessageType.NONE);
         }
     }
 
     private static boolean trayIconExists() {
         for (TrayIcon _trayIcon : SystemTray.getSystemTray().getTrayIcons()) {
-            if (trayIcon == _trayIcon) {
+            if (WINDOWS_trayIcon == _trayIcon) {
                 return true;
             }
         }
@@ -142,11 +170,41 @@ public class NotificationUtils {
         } else if (SystemUtils.IS_OS_MAC_OSX) {
             environment = Environment.OS_X;
         } else if (SystemUtils.IS_OS_LINUX) {
-            // TODO: At some point I'd like to be able to go into specific DEs
-            // TODO: Such as GNOME and KDE
             environment = Environment.LINUX;
         } else {
             environment = Environment.OTHER;
+        }
+    }
+
+    /**
+     * Copies the image from a notification to the system temp directory so we can use it
+     * from there. Returns the path to said temp file or null if it failed
+     *
+     * @param notification where we're getting our image from
+     * @return the path to the newly created temp file or null if it fails
+     */
+    private static String copyResourceToTemp(Notification notification) {
+        File file;
+        String resource = notification.getImageType().toString();
+        try {
+            InputStream input = XenForoNotifier.class.getClassLoader().getResourceAsStream(resource);
+            file = File.createTempFile(new Date().getTime() + "", ".png");
+            OutputStream out = new FileOutputStream(file);
+            int read;
+            byte[] bytes = new byte[1024];
+
+            while ((read = input.read(bytes)) != -1) {
+                out.write(bytes, 0, read);
+            }
+            out.flush();
+            out.close();
+            input.close();
+            file.deleteOnExit();
+
+            return file.getPath();
+        } catch (IOException ex) {
+            ex.printStackTrace();
+            return null;
         }
     }
 
