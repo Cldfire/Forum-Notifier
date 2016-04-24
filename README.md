@@ -7,6 +7,7 @@ Notifies users of their XenForo account's Messages and Notifications. This also 
 - Displays post and rating count.
 - Supports all XenForo sites (configuration needed).
 - Allows multiple XenForo sites and accounts.
+- Much, much more coming.
 
 ##Downloads & Support
 - [Changelog](changelog.md)
