@@ -2,6 +2,8 @@
 
 Notifies users of their XenForo account's Messages and Notifications. This also displays their post and rating count. 
 
+Please note that this project is currrently in the early stages of development.
+
 ##Features
 - Notifies user for all notifications.
 - Displays post and rating count.
