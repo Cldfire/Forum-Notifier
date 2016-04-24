@@ -13,6 +13,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 
+import java.net.URL;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -47,13 +48,15 @@ public class LoginViewController {
     private final ExecutorService executor = Executors.newFixedThreadPool(1);
 
     public void initialize() {
-        username.requestFocus();
         errorLabel.setText(LangUtils.translate("login.errorLabel"));
+        url.setPromptText(LangUtils.translate("login.url"));
+        validateButton.setText(LangUtils.translate("login.validate"));
         username.setPromptText(LangUtils.translate("login.username"));
         password.setPromptText(LangUtils.translate("login.password"));
         loginButton.setText(LangUtils.translate("login.button"));
         authCode.setPromptText(LangUtils.translate("login.authCode"));
         confirmButton.setText(LangUtils.translate("login.confirm"));
+        url.requestFocus();
     }
 
     public void setXenForoNotifier(XenForoNotifier xenForoNotifier) {
@@ -218,7 +221,7 @@ public class LoginViewController {
                     } else { // there was already an ArrayList for that forum
                         System.out.println("Arraylist already existed");
                         ArrayList<ForumAccount> addAccounts = new ArrayList<>();
-                        accounts.get(url.getText()).forEach(c -> addAccounts.add(c));
+                        accounts.get(url.getText()).forEach(addAccounts::add);
                         addAccounts.add(new ForumAccount(url.getText(), webClient.getCookieManager().getCookies(), getAccountName(tempConnProtocol + "://" + url.getText()), tempConnProtocol));
 
                         accounts.replace(url.getText(), addAccounts);
@@ -267,7 +270,7 @@ public class LoginViewController {
                } else { // there was already an ArrayList for that forum
                    System.out.println("Arraylist already existed");
                    ArrayList<ForumAccount> addAccounts = new ArrayList<>();
-                   accounts.get(url.getText()).forEach(c -> addAccounts.add(c));
+                   accounts.get(url.getText()).forEach(addAccounts::add);
                    addAccounts.add(new ForumAccount(url.getText(), webClient.getCookieManager().getCookies(), getAccountName(tempConnProtocol + "://" + url.getText()), tempConnProtocol));
 
                    accounts.replace(url.getText(), addAccounts);

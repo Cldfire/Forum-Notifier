@@ -6,10 +6,9 @@ import java.io.*;
 import java.util.Properties;
 
 public class Settings { // TODO: Clean this up
-
-    private static Properties properties;
     public static double version;
     public static double innerVersion;
+    private static Properties properties;
 
     public static String get(String key) {
         return properties.getProperty(key);
@@ -25,41 +24,25 @@ public class Settings { // TODO: Clean this up
 
     public static void load() {
         properties = new Properties();
-
         try {
             File file = new File(XenForoNotifier.APP_DIR, "settings.properties");
             if (file.exists()) {
                 properties.load(new FileInputStream(file));
             } else {
                 System.out.println("Settings File not found, creating one!");
-                file.createNewFile();
-                FileOutputStream outputStream = new FileOutputStream(file);
-                // This
                 InputStream inputStream = Settings.class.getResourceAsStream("/" + file.getName());
-
-                int read;
-                byte[] bytes = new byte[1024];
-                while ((read = inputStream.read(bytes)) != -1) {
-                    outputStream.write(bytes, 0, read);
-                }
-                outputStream.close();
-                inputStream.close();
-                // Or which is nice but I don't know how heavy either are so ¯\_(ツ)_/¯
-                /*
-                InputStream inputStream = Settings.class.getResourceAsStream("/" + file.getName());
-                Properties tmp = new Properties();
-                tmp.load(inputStream);
+                Properties tmpProperties = new Properties();
+                tmpProperties.load(inputStream);
                 FileOutputStream fileOutputStream = new FileOutputStream(new File(XenForoNotifier.APP_DIR, "settings.properties"));
-                tmp.store(fileOutputStream, "XenForo Notifier");
+                tmpProperties.store(fileOutputStream, "XenForo Notifier");
                 fileOutputStream.close();
-                 */
                 load();
             }
             InputStream inputStream = Settings.class.getResourceAsStream("/" + file.getName());
             version = Double.parseDouble(get("settings.version"));
-            Properties tmp = new Properties();
-            tmp.load(inputStream);
-            innerVersion = Double.parseDouble(tmp.getProperty("settings.version"));
+            Properties tmpProperties = new Properties();
+            tmpProperties.load(inputStream);
+            innerVersion = Double.parseDouble(tmpProperties.getProperty("settings.version"));
             inputStream.close();
         } catch (IOException e) {
             e.printStackTrace();

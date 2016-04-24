@@ -1,6 +1,8 @@
 window.title=XenForo Notifier
 login.username=username
 login.password=password
+login.url=Forum URL
+login.validate=Validate URL
 login.button=Log in
 login.authCode=Code
 login.confirm=Confirm
