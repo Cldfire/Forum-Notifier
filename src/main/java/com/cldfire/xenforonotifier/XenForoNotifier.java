@@ -40,9 +40,9 @@ import java.io.IOException;
 
 public class XenForoNotifier extends Application { // Project started April 1st, 2016
 
+    public static File APP_DIR;
     private Stage primaryStage;
     private BorderPane rootLayout;
-    public static File APP_DIR;
 
     public static void main(String[] args) {
         launch(args);
@@ -101,11 +101,8 @@ public class XenForoNotifier extends Application { // Project started April 1st,
         }
 
         Settings.load();
+        Settings.versionCheck();
         LangUtils.loadLocale(Locale.valueOf(Settings.get("client.lang")));
-        System.out.println(Settings.version);
-        System.out.println(Settings.innerVersion);
-        System.out.println(Settings.innerVersion > Settings.version); // If true then add new Settings to their Settings.
-
 
         this.primaryStage = primaryStage;
         this.primaryStage.setTitle(LangUtils.translate("window.title"));
