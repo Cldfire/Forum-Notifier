@@ -49,7 +49,7 @@ public class Forum {
         accounts.remove(account);
     }
 
-    enum ForumType {
+    public enum ForumType {
         XENFORO("XenForo");
 
         private final String name;
