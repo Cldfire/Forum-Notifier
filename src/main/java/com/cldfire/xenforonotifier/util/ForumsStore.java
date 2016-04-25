@@ -1,13 +1,13 @@
 package com.cldfire.xenforonotifier.util;
 
 import com.cldfire.xenforonotifier.XenForoNotifier;
-import com.cldfire.xenforonotifier.model.Account;
 import com.cldfire.xenforonotifier.model.Forum;
-import com.gargoylesoftware.htmlunit.util.Cookie;
 import com.google.gson.Gson;
 
 import java.io.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class ForumsStore { // TODO: Add things, idk what to add
     private static List<Forum> forums = new ArrayList<Forum>();
@@ -52,18 +52,11 @@ public class ForumsStore { // TODO: Add things, idk what to add
         forums.add(forum);
     }
 
-    public static Forum getForum(String forumurl) {
-        return forums.stream().filter(forum -> forumurl.equalsIgnoreCase(forum.getForum().toLowerCase())).findFirst().orElse(null);
+    public static void removeForum(Forum forum) {
+        forums.remove(forum);
     }
 
-    public static void lazy(String forumurl, String protocol, String name, Set<Cookie> cookies) {
-        Account account = new Account();
-        account.setName(name);
-        account.setCookies(cookies);
-        Forum forum = new Forum(forumurl);
-        forum.setProtocol(protocol);
-        forum.addAccount(account);
-
-        forums.add(forum);
+    public static Forum getForum(String forumurl) {
+        return forums.stream().filter(forum -> forumurl.equalsIgnoreCase(forum.getForum().toLowerCase())).findFirst().orElse(null);
     }
 }
