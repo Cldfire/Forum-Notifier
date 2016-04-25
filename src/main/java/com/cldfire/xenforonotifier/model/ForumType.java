@@ -15,7 +15,7 @@ public enum ForumType {
 
     public ForumType fromName(String name) {
         for (ForumType forumType : values()) {
-            if (name.equals(forumType.getName())) {
+            if (name.equalsIgnoreCase(forumType.getName())) {
                 return forumType;
             }
         }
