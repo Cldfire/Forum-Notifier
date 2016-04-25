@@ -3,6 +3,7 @@ package com.cldfire.xenforonotifier.util;
 import com.cldfire.xenforonotifier.XenForoNotifier;
 import com.cldfire.xenforonotifier.model.Forum;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -31,13 +32,17 @@ public class ForumsStore { // TODO: Add things, idk what to add
         if (fileReader != null) {
             Forum[] fora = gson.fromJson(fileReader, Forum[].class);
             if (fora != null) {
-                forums = Arrays.asList(fora);
+                forums = new ArrayList<>(Arrays.asList(fora));
             }
         }
     }
 
     public static void saveForums() {
-        Gson gson = new Gson();
+        GsonBuilder gsonBuilder = new GsonBuilder();
+        if (Boolean.valueOf(Settings.get("json.prettyprint"))) {
+            gsonBuilder.setPrettyPrinting().serializeNulls();
+        }
+        Gson gson = gsonBuilder.create();
         File file = new File(XenForoNotifier.APP_DIR, "forums.json");
         try {
             FileWriter fileWriter = new FileWriter(file);
@@ -50,10 +55,12 @@ public class ForumsStore { // TODO: Add things, idk what to add
 
     public static void addForum(Forum forum) {
         forums.add(forum);
+        saveForums();
     }
 
     public static void removeForum(Forum forum) {
         forums.remove(forum);
+        saveForums();
     }
 
     public static Forum getForum(String forumurl) {

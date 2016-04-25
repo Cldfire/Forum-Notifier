@@ -24,6 +24,7 @@ SOFTWARE.
 
 package com.cldfire.xenforonotifier;
 
+import com.cldfire.xenforonotifier.util.ForumsStore;
 import com.cldfire.xenforonotifier.util.LangUtils;
 import com.cldfire.xenforonotifier.util.LangUtils.Locale;
 import com.cldfire.xenforonotifier.util.Settings;
@@ -40,9 +41,9 @@ import java.io.IOException;
 
 public class XenForoNotifier extends Application { // Project started April 1st, 2016
 
+    public static File APP_DIR;
     private Stage primaryStage;
     private BorderPane rootLayout;
-    public static File APP_DIR;
 
     public static void main(String[] args) {
         launch(args);
@@ -106,6 +107,7 @@ public class XenForoNotifier extends Application { // Project started April 1st,
         System.out.println(Settings.innerVersion);
         System.out.println(Settings.innerVersion > Settings.version); // If true then add new Settings to their Settings.
 
+        ForumsStore.loadForums();
 
         this.primaryStage = primaryStage;
         this.primaryStage.setTitle(LangUtils.translate("window.title"));
