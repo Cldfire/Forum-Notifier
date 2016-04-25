@@ -49,4 +49,27 @@ public class Forum {
         accounts.remove(account);
     }
 
+    enum ForumType {
+        XENFORO("XenForo");
+
+        private final String name;
+
+        ForumType(String name) {
+            this.name = name;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public ForumType fromName(String name) {
+            for (ForumType forumType : values()) {
+                if (name.equalsIgnoreCase(forumType.getName())) {
+                    return forumType;
+                }
+            }
+            return null;
+        }
+    }
+
 }
