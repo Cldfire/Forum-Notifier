@@ -36,17 +36,24 @@ public class ForumsStore { // TODO: Add things, idk what to add
         }
     }
 
+    public static void saveForums() {
+        Gson gson = new Gson();
+        File file = new File(XenForoNotifier.APP_DIR, "forums.json");
+        try {
+            FileWriter fileWriter = new FileWriter(file);
+            fileWriter.write(gson.toJson(forums));
+            fileWriter.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     public static void addForum(Forum forum) {
         forums.add(forum);
     }
 
     public static Forum getForum(String forumurl) {
-        for (Forum forum : forums) {
-            if (forumurl.equalsIgnoreCase(forum.getForum().toLowerCase())) {
-                return forum;
-            }
-        }
-        return null;
+        return forums.stream().filter(forum -> forumurl.equalsIgnoreCase(forum.getForum().toLowerCase())).findFirst().orElse(null);
     }
 
     public static void lazy(String forumurl, String protocol, String name, Set<Cookie> cookies) {
