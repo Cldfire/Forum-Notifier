@@ -102,6 +102,7 @@ public class XenForoNotifier extends Application { // Project started April 1st,
         }
 
         Settings.load();
+        Settings.versionCheck();
         LangUtils.loadLocale(Locale.valueOf(Settings.get("client.lang")));
         System.out.println(Settings.version);
         System.out.println(Settings.innerVersion);

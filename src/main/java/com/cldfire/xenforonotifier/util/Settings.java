@@ -7,8 +7,9 @@ import java.util.Properties;
 
 public class Settings { // TODO: Clean this up
     public static double version;
-    public static double innerVersion;
+    public static double lVersion;
     private static Properties properties;
+    private static Properties lProperties;
 
     public static String get(String key) {
         return properties.getProperty(key);
@@ -40,9 +41,9 @@ public class Settings { // TODO: Clean this up
             }
             InputStream inputStream = Settings.class.getResourceAsStream("/" + file.getName());
             version = Double.parseDouble(get("settings.version"));
-            Properties tmpProperties = new Properties();
-            tmpProperties.load(inputStream);
-            innerVersion = Double.parseDouble(tmpProperties.getProperty("settings.version"));
+            lProperties = new Properties();
+            lProperties.load(inputStream);
+            lVersion = Double.parseDouble(lProperties.getProperty("settings.version"));
             inputStream.close();
         } catch (IOException e) {
             e.printStackTrace();
@@ -56,6 +57,16 @@ public class Settings { // TODO: Clean this up
             fileOutputStream.close();
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    public static void versionCheck() {
+        if (lVersion > version) {
+            lProperties.keySet().stream().filter(object -> !properties.containsKey(object)).forEach(object -> {
+                properties.setProperty((String) object, lProperties.getProperty((String) object));
+            });
+            properties.setProperty("settings.version", String.valueOf(lVersion));
+            save();
         }
     }
 }
