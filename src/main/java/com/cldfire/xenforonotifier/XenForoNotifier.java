@@ -95,10 +95,13 @@ public class XenForoNotifier extends Application { // Project started April 1st,
     }
 
     @Override
-    public void start(Stage primaryStage) {
+    public void start(Stage primaryStage) throws IOException {
         APP_DIR = new File(System.getProperty("user.home"), ".xenforonotifier");
         if (!APP_DIR.exists()) { // Technically first install
-            APP_DIR.mkdir();
+            boolean result = APP_DIR.mkdir();
+            if (!result) {
+                throw new IOException("Unable to create file: " + APP_DIR.getAbsolutePath()); // Supposedly stops the program
+            }
         }
 
         Settings.load();
