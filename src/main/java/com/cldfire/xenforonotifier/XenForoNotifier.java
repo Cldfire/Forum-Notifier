@@ -24,6 +24,7 @@ SOFTWARE.
 
 package com.cldfire.xenforonotifier;
 
+import com.cldfire.xenforonotifier.util.ForumsStore;
 import com.cldfire.xenforonotifier.util.LangUtils;
 import com.cldfire.xenforonotifier.util.LangUtils.Locale;
 import com.cldfire.xenforonotifier.util.Settings;
@@ -103,6 +104,11 @@ public class XenForoNotifier extends Application { // Project started April 1st,
         Settings.load();
         Settings.versionCheck();
         LangUtils.loadLocale(Locale.valueOf(Settings.get("client.lang")));
+        System.out.println(Settings.version);
+        System.out.println(Settings.innerVersion);
+        System.out.println(Settings.innerVersion > Settings.version); // If true then add new Settings to their Settings.
+
+        ForumsStore.loadForums();
 
         this.primaryStage = primaryStage;
         this.primaryStage.setTitle(LangUtils.translate("window.title"));
