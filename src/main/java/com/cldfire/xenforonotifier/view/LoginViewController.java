@@ -1,8 +1,10 @@
 package com.cldfire.xenforonotifier.view;
 
 import com.cldfire.xenforonotifier.XenForoNotifier;
+import com.cldfire.xenforonotifier.model.Account;
+import com.cldfire.xenforonotifier.model.Forum;
+import com.cldfire.xenforonotifier.util.ForumsStore;
 import com.cldfire.xenforonotifier.util.LangUtils;
-import com.cldfire.xenforonotifier.model.ForumAccount;
 import com.gargoylesoftware.htmlunit.BrowserVersion;
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.html.*;
@@ -12,9 +14,8 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
 
-import java.net.URL;
-import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -37,12 +38,13 @@ public class LoginViewController {
     private Button confirmButton;
     @FXML
     private Label errorLabel;
+    @FXML
+    private Button cancelButton;
 
     private XenForoNotifier xenForoNotifier;
-    public static Map<String, List<ForumAccount>> accounts = new HashMap<>();
-    public static Set<String> websiteList = new HashSet<>();
     private String temp2faUrl;
     private String tempConnProtocol;
+    private boolean doesForumExist;
 
     private final WebClient webClient = new WebClient(BrowserVersion.CHROME);
     private final ExecutorService executor = Executors.newFixedThreadPool(1);
@@ -63,6 +65,28 @@ public class LoginViewController {
         this.xenForoNotifier = xenForoNotifier;
     }
 
+    private void resetForNewLogin() {
+        validateButton.setVisible(true);
+        authCode.setVisible(false);
+        confirmButton.setVisible(false);
+        password.setVisible(false);
+        url.setVisible(true);
+
+        url.setText("");
+        username.setText("");
+        password.setText("");
+        authCode.setText("");
+
+        temp2faUrl = "";
+        tempConnProtocol = "";
+        doesForumExist = false;
+
+        webClient.getCache().clear();
+        webClient.getCookieManager().clearCookies();
+
+        url.requestFocus();
+    }
+
     private Boolean testForLoggedIn() { // TODO: Add more ways to detect that a user is logged in
         return webClient.getCookieManager().getCookies().size() > 5 || webClient.getCookieManager().getCookie("xf_user") != null || webClient.getCookieManager().getCookie("xf_user") != null;
     }
@@ -76,6 +100,15 @@ public class LoginViewController {
         HtmlStrong username;
 
         return null;
+    }
+
+    private Account getAccountDetails() {
+        //return new Account(webClient.getCookieManager().getCookies(), getAccountName(tempConnProtocol + "://" + url.getText()), tempConnProtocol, getForumFavicon(tempConnProtocol + "://" + url.getText() + "/favicon.ico"));
+        return new Account(webClient.getCookieManager().getCookies(), getAccountName(tempConnProtocol + "://" + url.getText()), tempConnProtocol);
+    }
+
+    private Image getForumFavicon(String url) {
+        return new Image("C:\\Users\\Jarek Samic\\Documents\\IDEA Projects\\XenForo-Notifier\\src\\main\\resources\\images\\notification-bell.png"); // this is temporary, you can thank Java's lack of support for .ico
     }
 
     private HtmlPage loginToSite(String url, String email, String password) {
@@ -194,6 +227,12 @@ public class LoginViewController {
     }
 
     @FXML
+    private void handleCancel() {
+        xenForoNotifier.showStatView();
+        resetForNewLogin();
+    }
+
+    @FXML
     private void handleLogin() { // TODO: Finalize error handling here, clean up where necessary
         Runnable loginRunnable = () -> {
             Platform.runLater(() -> errorLabel.setVisible(false));
@@ -211,31 +250,34 @@ public class LoginViewController {
 
                 } else if (testForLoggedIn()) {
                     System.out.println("We are logged in");
-                    if (accounts.get(url.getText()) == null) { // no ArrayList exists for this forum, create one
-                        System.out.println("Creating arraylist");
-                        ArrayList<ForumAccount> addAccount = new ArrayList<>();
-                        addAccount.add(new ForumAccount(url.getText(), webClient.getCookieManager().getCookies(), getAccountName(tempConnProtocol + "://" + url.getText()), tempConnProtocol)); // TODO: Make sure this uses correct protocol
 
-                        accounts.put(url.getText(), addAccount);
-                        System.out.println("Account has been added to a new arraylist");
-                    } else { // there was already an ArrayList for that forum
-                        System.out.println("Arraylist already existed");
-                        ArrayList<ForumAccount> addAccounts = new ArrayList<>();
-                        accounts.get(url.getText()).forEach(addAccounts::add);
-                        addAccounts.add(new ForumAccount(url.getText(), webClient.getCookieManager().getCookies(), getAccountName(tempConnProtocol + "://" + url.getText()), tempConnProtocol));
-
-                        accounts.replace(url.getText(), addAccounts);
-                    }
-
-                    if (!websiteList.contains(url.getText())) {
-                        System.out.println("Adding website");
-                        websiteList.add(url.getText());
-                    }
-
-                    Platform.runLater(() -> {
-                        xenForoNotifier.showStatView();
+                    ForumsStore.forums.forEach(f -> {
+                        System.out.println("forums for each");
+                        System.out.println(f.getUrl());
+                        if (f.getUrl().equalsIgnoreCase(url.getText())) {
+                            System.out.println("found forum");
+                            Account newAccount = getAccountDetails();
+                            f.addAccount(newAccount);
+                            ForumsStore.saveForums();
+                            doesForumExist = true;
+                            Platform.runLater(() -> {
+                                StatViewController.addAccountBlock(newAccount);
+                                xenForoNotifier.showStatView();
+                                resetForNewLogin();
+                            });
+                        }
                     });
 
+                    if (!doesForumExist) {
+                        Account newAccount = getAccountDetails();
+                        ForumsStore.addForum(new Forum(url.getText(), Forum.ForumType.XENFORO, tempConnProtocol, newAccount));
+
+                        Platform.runLater(() -> {
+                            StatViewController.addAccountBlock(newAccount);
+                            xenForoNotifier.showStatView();
+                            resetForNewLogin();
+                        });
+                    }
                 } else if (postLoginPage.getUrl().toString().equals(tempConnProtocol + "://" + url.getText() + "/login/login")) {
                     Platform.runLater(() -> {
                         errorLabel.setText(LangUtils.translate("login.errorLabel"));
@@ -260,31 +302,32 @@ public class LoginViewController {
            loginTwoFactorAuth(temp2faUrl, authCode.getText());
 
            if (testForLoggedIn()) {
-               if (accounts.get(url.getText()) == null) { // no ArrayList exists for this forum, create one
-                   System.out.println("Creating arraylist");
-                   ArrayList<ForumAccount> addAccount = new ArrayList<>();
-                   addAccount.add(new ForumAccount(url.getText(), webClient.getCookieManager().getCookies(), getAccountName(tempConnProtocol + "://" + url.getText()), tempConnProtocol));
+               System.out.println("We are logged in");
 
-                   accounts.put(url.getText(), addAccount);
-                   System.out.println("Account has been added to a new arraylist");
-               } else { // there was already an ArrayList for that forum
-                   System.out.println("Arraylist already existed");
-                   ArrayList<ForumAccount> addAccounts = new ArrayList<>();
-                   accounts.get(url.getText()).forEach(addAccounts::add);
-                   addAccounts.add(new ForumAccount(url.getText(), webClient.getCookieManager().getCookies(), getAccountName(tempConnProtocol + "://" + url.getText()), tempConnProtocol));
-
-                   accounts.replace(url.getText(), addAccounts);
-               }
-
-               if (!websiteList.contains(url.getText())) {
-                   System.out.println("Adding website");
-                   websiteList.add(url.getText());
-               }
-
-               Platform.runLater(() -> {
-                   xenForoNotifier.showStatView();
+               ForumsStore.forums.forEach(f -> {
+                   if (f.getUrl().equalsIgnoreCase(url.getText())) {
+                       Account newAccount = getAccountDetails();
+                       f.addAccount(newAccount);
+                       ForumsStore.saveForums();
+                       doesForumExist = true;
+                       Platform.runLater(() -> {
+                           StatViewController.addAccountBlock(newAccount);
+                           xenForoNotifier.showStatView();
+                           resetForNewLogin();
+                       });
+                   }
                });
 
+               if (!doesForumExist) {
+                   Account newAccount = getAccountDetails();
+                   ForumsStore.addForum(new Forum(url.getText(), Forum.ForumType.XENFORO, tempConnProtocol, newAccount));
+
+                   Platform.runLater(() -> {
+                       StatViewController.addAccountBlock(newAccount);
+                       xenForoNotifier.showStatView();
+                       resetForNewLogin();
+                   });
+               }
            } else { // wrong code entered
                Platform.runLater(() -> {
                    errorLabel.setText(LangUtils.translate("login.errorLabel.authCode"));

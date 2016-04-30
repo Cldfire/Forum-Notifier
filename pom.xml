@@ -78,6 +78,11 @@
             <version>5393c3a54f</version>
             <scope>compile</scope>
         </dependency>
+        <dependency>
+            <groupId>com.twelvemonkeys.imageio</groupId>
+            <artifactId>imageio</artifactId>
+            <version>3.2.1</version>
+        </dependency>
     </dependencies>
 
 </project>

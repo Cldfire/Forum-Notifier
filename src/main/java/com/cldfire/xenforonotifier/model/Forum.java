@@ -1,32 +1,40 @@
 package com.cldfire.xenforonotifier.model;
 
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
+
 import java.util.ArrayList;
 import java.util.List;
 
 public class Forum {
-    private String forum;
-    private ForumType type;
+    private final StringProperty url;
+    private final ObjectProperty<ForumType> type;
     private String protocol;
     private List<Account> accounts = new ArrayList<>();
 
-    public Forum(String forum) {
-        this.forum = forum;
+    public Forum(String url, ForumType type, String protocol, Account account) {
+        this.url = new SimpleStringProperty(url);
+        this.type = new SimpleObjectProperty<>(type);
+        this.protocol = protocol;
+        accounts.add(account);
     }
 
-    public String getForum() {
-        return forum;
+    public String getUrl() {
+        return url.get();
     }
 
-    public void setForum(String forum) {
-        this.forum = forum;
+    public void setUrl(String url) {
+        this.url.set(url);
     }
 
     public ForumType getType() {
-        return type;
+        return type.get();
     }
 
     public void setType(ForumType type) {
-        this.type = type;
+        this.type.set(type);
     }
 
     public String getProtocol() {

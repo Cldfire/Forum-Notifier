@@ -22,7 +22,7 @@ public class LangUtils { // TODO: Clean this up, rushed it to get repo online
      * @return Translated String
      */
     public static String translate(String property, String... replacey) {
-        String translate = properties.getProperty(property);
+        String translate = properties.getProperty(property, property);
         if (translate.contains("{0}")) {
             int cap = property.length() + Arrays.stream(replacey).mapToInt(String::length).sum();
             StringBuilder builder = new StringBuilder(cap);

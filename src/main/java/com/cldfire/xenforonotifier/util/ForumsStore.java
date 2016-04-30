@@ -11,7 +11,7 @@ import java.util.Arrays;
 import java.util.List;
 
 public class ForumsStore { // TODO: Add things, idk what to add
-    private static List<Forum> forums = new ArrayList<Forum>();
+    public static List<Forum> forums = new ArrayList<>();
 
     public static void loadForums() {
         Gson gson = new Gson();
@@ -64,6 +64,6 @@ public class ForumsStore { // TODO: Add things, idk what to add
     }
 
     public static Forum getForum(String forumurl) {
-        return forums.stream().filter(forum -> forumurl.equalsIgnoreCase(forum.getForum().toLowerCase())).findFirst().orElse(null);
+        return forums.stream().filter(f -> forumurl.equalsIgnoreCase(f.getUrl())).findFirst().orElse(null);
     }
 }

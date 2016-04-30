@@ -28,7 +28,10 @@ import com.cldfire.xenforonotifier.util.ForumsStore;
 import com.cldfire.xenforonotifier.util.LangUtils;
 import com.cldfire.xenforonotifier.util.LangUtils.Locale;
 import com.cldfire.xenforonotifier.util.Settings;
+import com.cldfire.xenforonotifier.util.notifications.EnumImageType;
+import com.cldfire.xenforonotifier.util.notifications.Notification;
 import com.cldfire.xenforonotifier.view.LoginViewController;
+import com.cldfire.xenforonotifier.view.RootLayoutController;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -44,6 +47,8 @@ public class XenForoNotifier extends Application { // Project started April 1st,
     public static File APP_DIR;
     private Stage primaryStage;
     private BorderPane rootLayout;
+    private AnchorPane statView;
+    private AnchorPane loginView;
 
     public static void main(String[] args) {
         launch(args);
@@ -58,33 +63,30 @@ public class XenForoNotifier extends Application { // Project started April 1st,
             Scene scene = new Scene(rootLayout);
             primaryStage.setScene(scene);
 
+            RootLayoutController controller = loader.getController();
+            controller.setXenForoNotifier(this);
+
             primaryStage.show();
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    public void showStatView() {
+    public void loadStatView() {
         try {
             FXMLLoader loader = new FXMLLoader();
             loader.setLocation(this.getClass().getClassLoader().getResource("views/StatView.fxml"));
-            AnchorPane statView = loader.load();
-
-            rootLayout.setCenter(statView);
-
+            statView = loader.load();
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    public void showLoginView() {
+    public void loadLoginView() {
         try {
             FXMLLoader loader = new FXMLLoader();
             loader.setLocation(this.getClass().getClassLoader().getResource("views/LoginView.fxml"));
-            AnchorPane loginView = loader.load();
-
-            // Set the view into the center of root layout
-            rootLayout.setCenter(loginView);
+            loginView = loader.load();
 
             LoginViewController controller = loader.getController();
             controller.setXenForoNotifier(this);
@@ -92,6 +94,14 @@ public class XenForoNotifier extends Application { // Project started April 1st,
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public void showStatView() {
+        rootLayout.setCenter(statView);
+    }
+
+    public void showLoginView() {
+        rootLayout.setCenter(loginView);
     }
 
     @Override
@@ -107,12 +117,14 @@ public class XenForoNotifier extends Application { // Project started April 1st,
         Settings.load();
         Settings.versionCheck();
         LangUtils.loadLocale(Locale.valueOf(Settings.get("client.lang")));
-        ForumsStore.loadForums();
+        //ForumsStore.loadForums();
 
         this.primaryStage = primaryStage;
         this.primaryStage.setTitle(LangUtils.translate("window.title"));
 
         initRootLayout();
-        showLoginView();
+        loadStatView();
+        loadLoginView();
+        showStatView();
     }
 }

@@ -141,7 +141,8 @@ class NotificationUtils {
     }
 
     private static void sendWindowsNotification(Notification notification) {
-        WINDOWS_trayIcon = new TrayIcon(awtImageFromEnum(notification.getImageType()), LangUtils.translate(notification.getTitle()));
+        System.out.println("Sending windows notification");
+        WINDOWS_trayIcon = new TrayIcon(awtImageFromEnum(notification.getImageType()), "test"); // TODO: This needs to use the translate method
         WINDOWS_trayIcon.setImageAutoSize(true);
         if (SystemTray.isSupported()) {
             if (!trayIconExists()) { // make sure we don't duplicate it / cause an error
