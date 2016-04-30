@@ -24,12 +24,9 @@ SOFTWARE.
 
 package com.cldfire.xenforonotifier;
 
-import com.cldfire.xenforonotifier.util.ForumsStore;
 import com.cldfire.xenforonotifier.util.LangUtils;
 import com.cldfire.xenforonotifier.util.LangUtils.Locale;
 import com.cldfire.xenforonotifier.util.Settings;
-import com.cldfire.xenforonotifier.util.notifications.EnumImageType;
-import com.cldfire.xenforonotifier.util.notifications.Notification;
 import com.cldfire.xenforonotifier.view.LoginViewController;
 import com.cldfire.xenforonotifier.view.RootLayoutController;
 import javafx.application.Application;
