@@ -5,10 +5,13 @@ import com.cldfire.xenforonotifier.model.Account;
 import com.cldfire.xenforonotifier.model.Forum;
 import com.cldfire.xenforonotifier.util.ForumsStore;
 import com.cldfire.xenforonotifier.util.LangUtils;
+import com.cldfire.xenforonotifier.util.animations.EnumAnimationType;
+import com.cldfire.xenforonotifier.util.animations.NodeAnimationUtils;
 import com.gargoylesoftware.htmlunit.BrowserVersion;
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.html.*;
 import javafx.application.Platform;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -59,6 +62,8 @@ public class LoginViewController {
         authCode.setPromptText(LangUtils.translate("login.authCode"));
         confirmButton.setText(LangUtils.translate("login.confirm"));
         url.requestFocus();
+
+        NodeAnimationUtils.bindFromToAnimation(EnumAnimationType.COLOR_FADE, url, 10);
     }
 
     public void setXenForoNotifier(XenForoNotifier xenForoNotifier) {

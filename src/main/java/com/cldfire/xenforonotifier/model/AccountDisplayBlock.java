@@ -23,6 +23,7 @@ public class AccountDisplayBlock extends ListCell<Account> {
     public AccountDisplayBlock() {
         blockPane = new AnchorPane();
         blockPane.setPrefSize(600, 100);
+
         backing = new Rectangle(600, 100, Color.ALICEBLUE);
         backing.setOpacity(0.7);
 
