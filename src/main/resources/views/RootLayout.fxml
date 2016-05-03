@@ -7,12 +7,12 @@
 
 <BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="500.0" prefWidth="800.0" stylesheets="@../stylesheets/insertnamehere.css" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.cldfire.xenforonotifier.view.RootLayoutController">
    <top>
-      <AnchorPane prefHeight="200.0" prefWidth="200.0" styleClass="background" stylesheets="@../stylesheets/insertnamehere.css" BorderPane.alignment="CENTER">
+      <AnchorPane prefHeight="50.0" prefWidth="200.0" styleClass="background" stylesheets="@../stylesheets/insertnamehere.css" BorderPane.alignment="CENTER">
          <BorderPane.margin>
             <Insets bottom="450.0" />
          </BorderPane.margin>
          <children>
-            <Button fx:id="addAccount" layoutX="748.0" layoutY="13.0" mnemonicParsing="false" onAction="#handleAddAccount" text="Add" AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="13.0" />
+            <Button fx:id="addAccount" layoutX="740.0" layoutY="11.0" mnemonicParsing="false" onAction="#handleAddAccount" text="Add" AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="11.0" />
          </children>
       </AnchorPane>
    </top>

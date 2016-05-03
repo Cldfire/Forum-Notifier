@@ -1,5 +1,6 @@
 package com.cldfire.xenforonotifier.model;
 
+import com.cldfire.xenforonotifier.XenForoNotifier;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.image.ImageView;
@@ -22,10 +23,10 @@ public class AccountDisplayBlock extends ListCell<Account> {
 
     public AccountDisplayBlock() {
         blockPane = new AnchorPane();
-        blockPane.setPrefSize(600, 100);
+        blockPane.setPrefSize(760, 100);
 
-        backing = new Rectangle(600, 100, Color.ALICEBLUE);
-        backing.setOpacity(0.7);
+        backing = new Rectangle(760, 100, Color.ALICEBLUE);
+        backing.setOpacity(0.9);
 
         header = new Label("...");
         header.setLayoutY(10);

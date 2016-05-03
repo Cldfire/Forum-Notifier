@@ -18,6 +18,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
+import javafx.scene.paint.Color;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -41,8 +42,6 @@ public class LoginViewController {
     private Button confirmButton;
     @FXML
     private Label errorLabel;
-    @FXML
-    private Button cancelButton;
 
     private XenForoNotifier xenForoNotifier;
     private String temp2faUrl;
@@ -63,15 +62,19 @@ public class LoginViewController {
         confirmButton.setText(LangUtils.translate("login.confirm"));
         url.requestFocus();
 
-        NodeAnimationUtils.bindFromToAnimation(EnumAnimationType.COLOR_FADE, url, 10);
+        NodeAnimationUtils.bindFromToAnimation(EnumAnimationType.COLOR_FADE, url, 0.7, new Color(0.3098039215686275, 0.3098039215686275, 0.3098039215686275, 1), new Color(0, 1, 0.9254901960784314, 1));
+        NodeAnimationUtils.bindFromToAnimation(EnumAnimationType.COLOR_FADE, username, 0.7, new Color(0.3098039215686275, 0.3098039215686275, 0.3098039215686275, 1), new Color(0, 1, 0.9254901960784314, 1));
+        NodeAnimationUtils.bindFromToAnimation(EnumAnimationType.COLOR_FADE, password, 0.7, new Color(0.3098039215686275, 0.3098039215686275, 0.3098039215686275, 1), new Color(0, 1, 0.9254901960784314, 1));
+        NodeAnimationUtils.bindFromToAnimation(EnumAnimationType.COLOR_FADE, authCode, 0.7, new Color(0.3098039215686275, 0.3098039215686275, 0.3098039215686275, 1), new Color(0, 1, 0.9254901960784314, 1));
     }
 
     public void setXenForoNotifier(XenForoNotifier xenForoNotifier) {
         this.xenForoNotifier = xenForoNotifier;
     }
 
-    private void resetForNewLogin() {
+    public void resetForNewLogin() {
         validateButton.setVisible(true);
+        username.setVisible(false);
         authCode.setVisible(false);
         confirmButton.setVisible(false);
         password.setVisible(false);
@@ -229,12 +232,6 @@ public class LoginViewController {
             }
         };
         executor.submit(validateRunnable);
-    }
-
-    @FXML
-    private void handleCancel() {
-        xenForoNotifier.showStatView();
-        resetForNewLogin();
     }
 
     @FXML

@@ -10,6 +10,7 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.beans.value.WritableValue;
 import javafx.event.EventHandler;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Region;
@@ -18,9 +19,9 @@ import javafx.util.Duration;
 
 public class NodeAnimationUtils {
 
-    public static void bindFromToAnimation(final EnumAnimationType animation, final Region bindObject, final Integer duration) {
-        final ObjectProperty<Color> warningColor = new SimpleObjectProperty<>(Color.GRAY);
-        final StringProperty colorStringProperty = createWarningColorStringProperty(warningColor);
+    public static void bindFromToAnimation(final EnumAnimationType animation, final Region bindObject, final Double duration, final Color fromColor, final Color toColor) {
+        final ObjectProperty<Color> color = new SimpleObjectProperty<>(fromColor);
+        final StringProperty colorStringProperty = createColorStringProperty(color);
 
         bindObject.styleProperty().bind(
                 new SimpleStringProperty(animation.getStyleProperty() + ": transparent transparent ")
@@ -34,20 +35,18 @@ public class NodeAnimationUtils {
                 if (newValue)
                 {
                     Timeline fade = new Timeline(
-                            new KeyFrame(Duration.seconds(0),    new KeyValue(warningColor, Color.GRAY, Interpolator.LINEAR)),
-                            new KeyFrame(Duration.seconds(0.1),  new KeyValue(warningColor, Color.GRAY, Interpolator.LINEAR)),
-                            new KeyFrame(Duration.seconds(0.35), new KeyValue(warningColor, Color.AQUAMARINE,  Interpolator.LINEAR)),
-                            new KeyFrame(Duration.seconds(0.75), new KeyValue(warningColor, Color.AQUAMARINE,  Interpolator.LINEAR))
+                            new KeyFrame(Duration.seconds(0),               new KeyValue(color, fromColor, Interpolator.LINEAR)),
+                            new KeyFrame(Duration.seconds(duration * 0.25), new KeyValue(color, toColor, Interpolator.LINEAR)),
+                            new KeyFrame(Duration.seconds(duration * 0.75), new KeyValue(color, toColor, Interpolator.LINEAR))
                     );
                     fade.play();
                 }
                 else
                 {
                     Timeline fade = new Timeline(
-                            new KeyFrame(Duration.seconds(0),    new KeyValue(warningColor, Color.AQUAMARINE, Interpolator.LINEAR)),
-                            new KeyFrame(Duration.seconds(0.1),  new KeyValue(warningColor, Color.AQUAMARINE, Interpolator.LINEAR)),
-                            new KeyFrame(Duration.seconds(0.35), new KeyValue(warningColor, Color.GRAY,  Interpolator.LINEAR)),
-                            new KeyFrame(Duration.seconds(0.75), new KeyValue(warningColor, Color.GRAY,  Interpolator.LINEAR))
+                            new KeyFrame(Duration.seconds(0),               new KeyValue(color, toColor, Interpolator.LINEAR)),
+                            new KeyFrame(Duration.seconds(duration * 0.25), new KeyValue(color, fromColor, Interpolator.LINEAR)),
+                            new KeyFrame(Duration.seconds(duration * 0.75), new KeyValue(color, fromColor, Interpolator.LINEAR))
                     );
                     fade.play();
                 }
@@ -55,13 +54,13 @@ public class NodeAnimationUtils {
         });
     }
 
-    private static StringProperty createWarningColorStringProperty(final ObjectProperty<Color> warningColor) {
+    private static StringProperty createColorStringProperty(final ObjectProperty<Color> color) {
         final StringProperty colorStringProperty = new SimpleStringProperty();
-        setColorStringFromColor(colorStringProperty, warningColor);
-        warningColor.addListener(new ChangeListener<Color>() {
+        setColorStringFromColor(colorStringProperty, color);
+        color.addListener(new ChangeListener<Color>() {
             @Override
             public void changed(ObservableValue<? extends Color> observableValue, Color oldColor, Color newColor) {
-                setColorStringFromColor(colorStringProperty, warningColor);
+                setColorStringFromColor(colorStringProperty, color);
             }
         });
 

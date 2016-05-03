@@ -6,16 +6,15 @@
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="500.0" prefWidth="800.0" styleClass="background" stylesheets="@../stylesheets/insertnamehere.css" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.cldfire.xenforonotifier.view.LoginViewController">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="450.0" prefWidth="800.0" styleClass="background" stylesheets="@../stylesheets/insertnamehere.css" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.cldfire.xenforonotifier.view.LoginViewController">
    <children>
-      <TextField fx:id="username" layoutX="326.0" layoutY="218.0" promptText="username" visible="false" />
-      <PasswordField fx:id="password" layoutX="326.0" layoutY="250.0" promptText="password" visible="false" />
-      <Button fx:id="loginButton" layoutX="375.0" layoutY="288.0" mnemonicParsing="false" onAction="#handleLogin" text="Log In" />
-      <TextField fx:id="authCode" layoutX="327.0" layoutY="218.0" promptText="code" visible="false" />
-      <Button fx:id="confirmButton" layoutX="371.0" layoutY="288.0" mnemonicParsing="false" onAction="#handleTwoFactorAuthLogin" text="Confirm" visible="false" />
-      <Label fx:id="errorLabel" layoutX="352.0" layoutY="194.0" text="Invalid credentials" textFill="RED" visible="false" />
-      <TextField fx:id="url" layoutX="326.0" layoutY="218.0" promptText="Forum URL" />
-      <Button fx:id="validateButton" layoutX="358.0" layoutY="288.0" mnemonicParsing="false" onAction="#handleValidate" text="Validate URL" />
-      <Button fx:id="cancelButton" layoutX="374.0" layoutY="377.0" mnemonicParsing="false" onAction="#handleCancel" text="Cancel" />
+      <TextField fx:id="username" layoutX="300.0" layoutY="215.0" prefWidth="200.0" promptText="username" visible="false" />
+      <PasswordField fx:id="password" layoutX="300.0" layoutY="255.0" prefWidth="200.0" promptText="password" visible="false" />
+      <Button fx:id="loginButton" layoutX="370.0" layoutY="305.0" mnemonicParsing="false" onAction="#handleLogin" prefWidth="60.0" text="Log In" visible="false" />
+      <TextField fx:id="authCode" layoutX="300.0" layoutY="215.0" prefWidth="200.0" promptText="code" visible="false" />
+      <Button fx:id="confirmButton" layoutX="365.0" layoutY="305.0" mnemonicParsing="false" onAction="#handleTwoFactorAuthLogin" prefWidth="70.0" text="Confirm" visible="false" />
+      <Label fx:id="errorLabel" alignment="CENTER" contentDisplay="TEXT_ONLY" layoutX="200.0" layoutY="186.0" prefWidth="400.0" styleClass="error-label" text="Invalid credentials" textAlignment="CENTER" textFill="RED" visible="false" />
+      <TextField fx:id="url" layoutX="300.0" layoutY="215.0" prefHeight="30.0" prefWidth="200.0" promptText="Forum URL" />
+      <Button fx:id="validateButton" layoutX="350.0" layoutY="305.0" mnemonicParsing="false" onAction="#handleValidate" prefWidth="100.0" text="Validate URL" />
    </children>
 </AnchorPane>
