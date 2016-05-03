@@ -1,6 +1,5 @@
 package com.cldfire.xenforonotifier.model;
 
-import com.cldfire.xenforonotifier.XenForoNotifier;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.image.ImageView;

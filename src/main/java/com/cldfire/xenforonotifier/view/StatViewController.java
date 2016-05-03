@@ -18,16 +18,22 @@ import javafx.scene.control.ListView;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.*;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
 
 public class StatViewController {
+    private static ObservableList<Account> accountBlocks;
+    private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
     @FXML
     private ListView<Account> accountOverview;
 
-    private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
-    private static ObservableList<Account> accountBlocks;
+    public static void addAccountBlock(Account account) {
+        accountBlocks.add(account);
+        System.out.println(accountBlocks.size());
+        System.out.println(accountBlocks);
+    }
 
     @FXML
     private void initialize() {
@@ -101,12 +107,6 @@ public class StatViewController {
         values.put("posts", "N/A");
         return values;
     } // TODO: Make it so I only have to pass in an account, same for getXenToken
-
-    public static void addAccountBlock(Account account) {
-        accountBlocks.add(account);
-        System.out.println(accountBlocks.size());
-        System.out.println(accountBlocks);
-    }
 
     private void checkEverythingAtFixedRate() { // TODO: I'm very aware this is not going to thread properly atm, will fix in the future
         Runnable getEverythingRunnable = () -> {

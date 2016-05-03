@@ -11,7 +11,6 @@ import com.gargoylesoftware.htmlunit.BrowserVersion;
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.html.*;
 import javafx.application.Platform;
-import javafx.beans.property.SimpleStringProperty;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -26,6 +25,8 @@ import java.util.concurrent.Executors;
 public class LoginViewController {
     // TODO: Add method to get connection protocol for a site, store said information in the ForumAccount
 
+    private final WebClient webClient = new WebClient(BrowserVersion.CHROME);
+    private final ExecutorService executor = Executors.newFixedThreadPool(1);
     @FXML
     private TextField url;
     @FXML
@@ -42,14 +43,10 @@ public class LoginViewController {
     private Button confirmButton;
     @FXML
     private Label errorLabel;
-
     private XenForoNotifier xenForoNotifier;
     private String temp2faUrl;
     private String tempConnProtocol;
     private boolean doesForumExist;
-
-    private final WebClient webClient = new WebClient(BrowserVersion.CHROME);
-    private final ExecutorService executor = Executors.newFixedThreadPool(1);
 
     public void initialize() {
         errorLabel.setText(LangUtils.translate("login.errorLabel"));
@@ -299,44 +296,44 @@ public class LoginViewController {
 
     @FXML
     private void handleTwoFactorAuthLogin() { // TODO: Get this to support 2FA via emailed code or whatever that method is
-       Runnable twoFactorRunnable = () -> {
-           Platform.runLater(() -> errorLabel.setVisible(false));
-           loginTwoFactorAuth(temp2faUrl, authCode.getText());
+        Runnable twoFactorRunnable = () -> {
+            Platform.runLater(() -> errorLabel.setVisible(false));
+            loginTwoFactorAuth(temp2faUrl, authCode.getText());
 
-           if (testForLoggedIn()) {
-               System.out.println("We are logged in");
+            if (testForLoggedIn()) {
+                System.out.println("We are logged in");
 
-               ForumsStore.forums.forEach(f -> {
-                   if (f.getUrl().equalsIgnoreCase(url.getText())) {
-                       Account newAccount = getAccountDetails();
-                       f.addAccount(newAccount);
-                       ForumsStore.saveForums();
-                       doesForumExist = true;
-                       Platform.runLater(() -> {
-                           StatViewController.addAccountBlock(newAccount);
-                           xenForoNotifier.showStatView();
-                           resetForNewLogin();
-                       });
-                   }
-               });
+                ForumsStore.forums.forEach(f -> {
+                    if (f.getUrl().equalsIgnoreCase(url.getText())) {
+                        Account newAccount = getAccountDetails();
+                        f.addAccount(newAccount);
+                        ForumsStore.saveForums();
+                        doesForumExist = true;
+                        Platform.runLater(() -> {
+                            StatViewController.addAccountBlock(newAccount);
+                            xenForoNotifier.showStatView();
+                            resetForNewLogin();
+                        });
+                    }
+                });
 
-               if (!doesForumExist) {
-                   Account newAccount = getAccountDetails();
-                   ForumsStore.addForum(new Forum(url.getText(), Forum.ForumType.XENFORO, tempConnProtocol, newAccount));
+                if (!doesForumExist) {
+                    Account newAccount = getAccountDetails();
+                    ForumsStore.addForum(new Forum(url.getText(), Forum.ForumType.XENFORO, tempConnProtocol, newAccount));
 
-                   Platform.runLater(() -> {
-                       StatViewController.addAccountBlock(newAccount);
-                       xenForoNotifier.showStatView();
-                       resetForNewLogin();
-                   });
-               }
-           } else { // wrong code entered
-               Platform.runLater(() -> {
-                   errorLabel.setText(LangUtils.translate("login.errorLabel.authCode"));
-                   errorLabel.setVisible(true);
-                   authCode.setText("");
-               });
-           }
+                    Platform.runLater(() -> {
+                        StatViewController.addAccountBlock(newAccount);
+                        xenForoNotifier.showStatView();
+                        resetForNewLogin();
+                    });
+                }
+            } else { // wrong code entered
+                Platform.runLater(() -> {
+                    errorLabel.setText(LangUtils.translate("login.errorLabel.authCode"));
+                    errorLabel.setVisible(true);
+                    authCode.setText("");
+                });
+            }
         };
         executor.submit(twoFactorRunnable);
     }

@@ -43,6 +43,7 @@ public class LangUtils { // TODO: Clean this up, rushed it to get repo online
 
     /**
      * Loads the locale
+     *
      * @param locale {@link Locale}
      */
     public static void loadLocale(Locale locale) {

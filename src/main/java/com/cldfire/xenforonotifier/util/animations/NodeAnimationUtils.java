@@ -10,9 +10,6 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-import javafx.beans.value.WritableValue;
-import javafx.event.EventHandler;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
 import javafx.util.Duration;
@@ -32,19 +29,16 @@ public class NodeAnimationUtils {
         bindObject.focusedProperty().addListener(new ChangeListener<Boolean>() {
             @Override
             public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
-                if (newValue)
-                {
+                if (newValue) {
                     Timeline fade = new Timeline(
-                            new KeyFrame(Duration.seconds(0),               new KeyValue(color, fromColor, Interpolator.LINEAR)),
+                            new KeyFrame(Duration.seconds(0), new KeyValue(color, fromColor, Interpolator.LINEAR)),
                             new KeyFrame(Duration.seconds(duration * 0.25), new KeyValue(color, toColor, Interpolator.LINEAR)),
                             new KeyFrame(Duration.seconds(duration * 0.75), new KeyValue(color, toColor, Interpolator.LINEAR))
                     );
                     fade.play();
-                }
-                else
-                {
+                } else {
                     Timeline fade = new Timeline(
-                            new KeyFrame(Duration.seconds(0),               new KeyValue(color, toColor, Interpolator.LINEAR)),
+                            new KeyFrame(Duration.seconds(0), new KeyValue(color, toColor, Interpolator.LINEAR)),
                             new KeyFrame(Duration.seconds(duration * 0.25), new KeyValue(color, fromColor, Interpolator.LINEAR)),
                             new KeyFrame(Duration.seconds(duration * 0.75), new KeyValue(color, fromColor, Interpolator.LINEAR))
                     );
@@ -70,9 +64,9 @@ public class NodeAnimationUtils {
     private static void setColorStringFromColor(StringProperty colorStringProperty, ObjectProperty<Color> color) {
         colorStringProperty.set(
                 "rgba("
-                        + ((int) (color.get().getRed()   * 255)) + ","
+                        + ((int) (color.get().getRed() * 255)) + ","
                         + ((int) (color.get().getGreen() * 255)) + ","
-                        + ((int) (color.get().getBlue()  * 255)) + ","
+                        + ((int) (color.get().getBlue() * 255)) + ","
                         + color.get().getOpacity() +
                         ")"
         );
