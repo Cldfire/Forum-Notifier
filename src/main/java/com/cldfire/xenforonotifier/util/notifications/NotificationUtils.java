@@ -1,7 +1,6 @@
 package com.cldfire.xenforonotifier.util.notifications;
 
 import com.cldfire.xenforonotifier.XenForoNotifier;
-import com.cldfire.xenforonotifier.util.LangUtils;
 import com.github.plushaze.traynotification.animations.Animations;
 import com.github.plushaze.traynotification.notification.TrayNotification;
 import javafx.embed.swing.SwingFXUtils;

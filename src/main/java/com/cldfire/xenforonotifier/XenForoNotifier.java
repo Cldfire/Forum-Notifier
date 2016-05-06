@@ -27,10 +27,12 @@ package com.cldfire.xenforonotifier;
 import com.cldfire.xenforonotifier.util.LangUtils;
 import com.cldfire.xenforonotifier.util.LangUtils.Locale;
 import com.cldfire.xenforonotifier.util.Settings;
+import com.cldfire.xenforonotifier.util.animations.ParticleAnimation;
 import com.cldfire.xenforonotifier.view.LoginViewController;
 import com.cldfire.xenforonotifier.view.RootLayoutController;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
@@ -74,6 +76,8 @@ public class XenForoNotifier extends Application { // Project started April 1st,
             FXMLLoader loader = new FXMLLoader();
             loader.setLocation(this.getClass().getClassLoader().getResource("views/StatView.fxml"));
             statView = loader.load();
+            BorderPane.setMargin(statView, new Insets(0, 0, 450, 0));
+            new ParticleAnimation(statView);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -84,6 +88,7 @@ public class XenForoNotifier extends Application { // Project started April 1st,
             FXMLLoader loader = new FXMLLoader();
             loader.setLocation(this.getClass().getClassLoader().getResource("views/LoginView.fxml"));
             loginView = loader.load();
+            BorderPane.setMargin(loginView, new Insets(0, 0, 450, 0));
 
             LoginViewController controller = loader.getController();
             controller.setXenForoNotifier(this);

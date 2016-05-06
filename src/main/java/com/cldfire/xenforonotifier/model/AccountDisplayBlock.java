@@ -22,9 +22,10 @@ public class AccountDisplayBlock extends ListCell<Account> {
 
     public AccountDisplayBlock() {
         blockPane = new AnchorPane();
-        blockPane.setPrefSize(600, 100);
-        backing = new Rectangle(600, 100, Color.ALICEBLUE);
-        backing.setOpacity(0.7);
+        blockPane.setPrefSize(760, 100);
+
+        backing = new Rectangle(760, 100, Color.ALICEBLUE);
+        backing.setOpacity(0.9);
 
         header = new Label("...");
         header.setLayoutY(10);

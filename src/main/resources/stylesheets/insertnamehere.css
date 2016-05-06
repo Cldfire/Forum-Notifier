@@ -1,0 +1,68 @@
+.root {
+    -fx-accent: #00ffec;
+}
+
+.background {
+    -fx-background-color: #151515;
+}
+
+.background-transparent {
+    -fx-background-color: transparent;
+}
+
+.label {
+    -fx-font-size: 10pt;
+    -fx-text-fill: white;
+    -fx-font-family: "Segoe UI";
+    -fx-opacity: 1;
+}
+
+.error-label {
+    -fx-font-size: 9pt;
+    -fx-text-fill: #ff5757;
+    -fx-font-family: "Segoe UI";
+    -fx-opacity: 1;
+}
+
+.text-input {
+    -fx-padding: 5 0 5 0;
+    -fx-border-color: transparent transparent derive(#242424,20%) transparent;
+    -fx-border-width: 1;
+    -fx-background-color: transparent;
+    -fx-font-family: "Segoe UI";
+    -fx-font-size: 10pt;
+    -fx-text-fill: #d8d8d8;
+}
+
+.text-input:focused {
+    -fx-border-color: transparent transparent -fx-accent transparent;
+    -fx-text-fill: white;
+}
+
+.button {
+    -fx-padding: 5 10 5 10;
+    -fx-border-color: white;
+    -fx-border-width: 1.5;
+    -fx-border-radius: 5 5 5 5;
+    -fx-background-radius: 20;
+    -fx-background-color: transparent;
+    -fx-font-family: "Segoe UI";
+    -fx-font-size: 9pt;
+    -fx-text-fill: #d8d8d8;
+}
+
+.button:pressed {
+  -fx-border-width: 0.5;
+}
+
+.list-cell {
+    -fx-background-color: transparent;
+}
+
+.list-cell:filled:selected:focused, .list-cell:filled:selected {
+    -fx-background-color: transparent;
+}
+
+.list-cell:even:odd {
+    -fx-background-color: transparent;
+}

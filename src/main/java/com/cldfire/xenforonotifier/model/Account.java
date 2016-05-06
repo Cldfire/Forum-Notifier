@@ -1,20 +1,20 @@
 package com.cldfire.xenforonotifier.model;
 
 import com.cldfire.xenforonotifier.util.ForumsStore;
-import com.cldfire.xenforonotifier.view.LoginViewController;
 import com.gargoylesoftware.htmlunit.util.Cookie;
-import javafx.beans.property.*;
-import javafx.scene.image.Image;
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 
 import java.util.Set;
 
 public class Account { // TODO: Make sure all this becomes thread safe at some point or another
-    private Set<Cookie> cookies;
     private final StringProperty name;
-    private String connProtocol;
-
     private final IntegerProperty alertCount;
     private final IntegerProperty messageCount;
+    private Set<Cookie> cookies;
+    private String connProtocol;
     //private final ObjectProperty<Image> favicon;
 
     public Account(Set<Cookie> cookies, String name, String connProtocol) {
@@ -82,7 +82,7 @@ public class Account { // TODO: Make sure all this becomes thread safe at some p
     //    return favicon.get();
     //}
 
-   // public void setFavicon(Image favicon) {
+    // public void setFavicon(Image favicon) {
     //    this.favicon.set(favicon);
     //}
 }

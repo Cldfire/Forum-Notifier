@@ -1,9 +1,8 @@
 package com.cldfire.xenforonotifier.view;
 
 import com.cldfire.xenforonotifier.XenForoNotifier;
-import com.cldfire.xenforonotifier.util.LangUtils;
 import javafx.fxml.FXML;
-import javafx.scene.control.*;
+import javafx.scene.control.Button;
 
 public class RootLayoutController {
     @FXML
