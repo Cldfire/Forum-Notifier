@@ -5,6 +5,7 @@ import javafx.animation.Interpolator;
 import javafx.animation.PathTransition;
 import javafx.animation.ScaleTransition;
 import javafx.application.Platform;
+import javafx.scene.effect.GaussianBlur;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
@@ -24,14 +25,14 @@ public class ParticleAnimation {
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
 
     public ParticleAnimation(Pane layer) {
-        //executor.submit(() -> {
+        executor.submit(() -> {
             Random randGen = new Random();
 
             for (int i = randGen.nextInt(30) * 10 + 20; i > 0; i--) {
-                Circle test = createParticle(1.0, Color.AQUAMARINE, layer);
-               // Platform.runLater(() -> {
+                Circle test = createParticle(randGen.nextDouble(), Color.AQUAMARINE);
+               Platform.runLater(() -> {
                     layer.getChildren().add(test);
-               // });
+               });
                 animate(test, generateRandomPath(layer));
                 try {
                     Thread.sleep(randGen.nextInt(5));
@@ -39,23 +40,24 @@ public class ParticleAnimation {
                     e.printStackTrace();
                 }
             }
-       // });
+       });
     }
 
-    private Circle createParticle(Double radius, Color color, Pane layer) {
+    private Circle createParticle(Double radius, Color color) {
         Random randGen = new Random();
 
         Circle returnCircle = new Circle(radius, color);
         returnCircle.setOpacity(0.0);
         returnCircle.setTranslateX(randGen.nextInt(800));
         returnCircle.setTranslateY(randGen.nextInt(500));
+        returnCircle.setEffect(new GaussianBlur(randGen.nextInt(10) + 1));
         return returnCircle;
     }
 
     private void animate(Circle particle, Path path) {
         Random randGen = new Random();
 
-        PathTransition pathTransition = new PathTransition(Duration.seconds(path.getElements().size() * (randGen.nextInt(10) + 9)), path, particle);
+        PathTransition pathTransition = new PathTransition(Duration.seconds(path.getElements().size() * (randGen.nextInt(30) + 30)), path, particle);
         pathTransition.setInterpolator(Interpolator.EASE_OUT);
 
         ScaleTransition scaleTransition = new ScaleTransition(Duration.seconds(3f), particle);
@@ -79,7 +81,7 @@ public class ParticleAnimation {
         int dimensionY = (int) layer.getPrefHeight();
         int pathPointNum = randGen.nextInt(50) + randGen.nextInt(20) + 5;
         Path particlePath = new Path();
-        particlePath.getElements().add(new MoveTo(-20, -20));
+        particlePath.getElements().add(new MoveTo(randGen.nextInt(800), randGen.nextInt(500)));
 
         for (int i = pathPointNum; i > 0; i--) {
             particlePath.getElements().add(new CubicCurveTo(randGen.nextInt(500), randGen.nextInt(500), randGen.nextInt(500), randGen.nextInt(500), randGen.nextInt(dimensionX), randGen.nextInt(dimensionY)));
