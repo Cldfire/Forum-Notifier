@@ -3,7 +3,6 @@ package com.cldfire.xenforonotifier.view;
 import com.cldfire.xenforonotifier.model.Account;
 import com.cldfire.xenforonotifier.model.AccountDisplayBlock;
 import com.cldfire.xenforonotifier.util.ForumsStore;
-import com.cldfire.xenforonotifier.util.notifications.EnumImageType;
 import com.cldfire.xenforonotifier.util.notifications.Notification;
 import com.gargoylesoftware.htmlunit.BrowserVersion;
 import com.gargoylesoftware.htmlunit.WebClient;
@@ -16,6 +15,9 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.ListView;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Executors;
@@ -28,6 +30,18 @@ public class StatViewController {
     private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
     @FXML
     private ListView<Account> accountOverview;
+    // TODO start: This is temp right? Eventually these will be entirely dynamic
+    private BufferedImage notifImage = getTempNotifImage();
+
+    private BufferedImage getTempNotifImage() {
+        try {
+            return ImageIO.read(ClassLoader.getSystemResource("images/notification-bell.png"));
+        } catch (IOException ex) {
+            ex.printStackTrace();
+            return null;
+        }
+    }
+    // TODO end
 
     public static void addAccountBlock(Account account) {
         accountBlocks.add(account);
@@ -124,17 +138,17 @@ public class StatViewController {
 
                     if (newMessagesCount > a.getMessageCount()) { // TODO: Get notifications to work when both a message and alert notification needs to be created
                         if (newMessagesCount - a.getMessageCount() == 1) {
-                            new Notification("XenForo Notifier", "You have a new message", EnumImageType.ALERT).send();
+                            new Notification("XenForo Notifier", "You have a new message", notifImage).send();
                         } else {
-                            new Notification("XenForo Notifier", "You have " + (newMessagesCount - a.getMessageCount()) + " new messages", EnumImageType.ALERT).send();
+                            new Notification("XenForo Notifier", "You have " + (newMessagesCount - a.getMessageCount()) + " new messages", notifImage).send();
                         }
                     }
 
                     if (newAlertsCount > a.getAlertCount()) {
                         if (newAlertsCount - a.getAlertCount() == 1) {
-                            new Notification("XenForo Notifier", "You have a new alert", EnumImageType.ALERT).send();
+                            new Notification("XenForo Notifier", "You have a new alert", notifImage).send();
                         } else {
-                            new Notification("XenForo Notifier", "You have " + (newAlertsCount - a.getAlertCount()) + " new alerts", EnumImageType.ALERT).send();
+                            new Notification("XenForo Notifier", "You have " + (newAlertsCount - a.getAlertCount()) + " new alerts", notifImage).send();
                         }
                     }
                     a.setMessageCount(newMessagesCount);

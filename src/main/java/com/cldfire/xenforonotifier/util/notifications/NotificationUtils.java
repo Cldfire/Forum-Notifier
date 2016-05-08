@@ -4,7 +4,6 @@ import com.cldfire.xenforonotifier.XenForoNotifier;
 import com.github.plushaze.traynotification.animations.Animations;
 import com.github.plushaze.traynotification.notification.TrayNotification;
 import javafx.embed.swing.SwingFXUtils;
-import javafx.scene.image.Image;
 import javafx.util.Duration;
 import org.apache.commons.lang3.SystemUtils;
 
@@ -12,35 +11,13 @@ import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.TrayIcon.MessageType;
 import java.awt.image.BufferedImage;
+import java.awt.image.ColorModel;
+import java.awt.image.WritableRaster;
 import java.io.*;
-import java.net.URL;
 import java.util.Date;
 
 class NotificationUtils {
     private static Environment environment;
-    private static TrayIcon WINDOWS_trayIcon;
-
-    /**
-     * Helper to get a Buffered image from an EnumImageType
-     *
-     * @param enumImageType enum for path
-     * @return BufferedImage from specified path
-     */
-    private static BufferedImage awtImageFromEnum(EnumImageType enumImageType) {
-        URL urlToImage = XenForoNotifier.class.getClassLoader().getResource(enumImageType.toString());
-        if (urlToImage == null) {
-            throw new IllegalArgumentException("URL to Image cannot be null! Check your path!");
-        }
-
-        BufferedImage image = null;
-        try {
-            image = ImageIO.read(urlToImage);
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
-
-        return image;
-    }
 
     /**
      * Helper to get FX images from BufferedImages
@@ -50,16 +27,6 @@ class NotificationUtils {
      */
     private static javafx.scene.image.Image fxImageFromAWTImage(BufferedImage image) {
         return SwingFXUtils.toFXImage(image, null);
-    }
-
-    /**
-     * Helper to get an FX Image from an EnumImageType
-     *
-     * @param enumImageType enum for path
-     * @return BufferedImage from specified path
-     */
-    private static Image fxImageFromEnum(EnumImageType enumImageType) {
-        return fxImageFromAWTImage(awtImageFromEnum(enumImageType));
     }
 
     /**
@@ -105,7 +72,7 @@ class NotificationUtils {
             return; // Bail out
         }
 
-        String path = copyResourceToTemp(notification);
+        String path = copyResourceToTemp(notification.getImage());
         if (path == null) {
             sendOtherNotification(notification);
             return; // Bail out
@@ -132,7 +99,7 @@ class NotificationUtils {
             tray.setTitle(String.valueOf(notification.getTitle()));
             tray.setMessage(String.valueOf(notification.getSubtitle()));
             tray.setAnimation(Animations.POPUP);
-            tray.setImage(fxImageFromEnum(notification.getImageType()));
+            tray.setImage(fxImageFromAWTImage(notification.getImage()));
             tray.showAndDismiss(Duration.seconds(notification.getDelay()));
         } catch (Exception e) {
             e.printStackTrace();
@@ -140,30 +107,38 @@ class NotificationUtils {
     }
 
     private static void sendWindowsNotification(Notification notification) {
-        System.out.println("Sending windows notification");
-        WINDOWS_trayIcon = new TrayIcon(awtImageFromEnum(notification.getImageType()), "test"); // TODO: This needs to use the translate method
-        WINDOWS_trayIcon.setImageAutoSize(true);
+        TrayIcon trayIcon = new TrayIcon(notification.getImage());
+        trayIcon.setImageAutoSize(true);
         if (SystemTray.isSupported()) {
-            if (!trayIconExists()) { // make sure we don't duplicate it / cause an error
+            if (!windowsTrayIconExists(trayIcon)) { // make sure we don't duplicate it / cause an error
                 try {
-                    SystemTray.getSystemTray().add(WINDOWS_trayIcon);
+                    SystemTray.getSystemTray().add(trayIcon);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
-            WINDOWS_trayIcon.displayMessage(String.valueOf(notification.getTitle()), String.valueOf(notification.getSubtitle()), MessageType.NONE);
+            trayIcon.displayMessage(String.valueOf(notification.getTitle()), String.valueOf(notification.getSubtitle()), MessageType.NONE);
         }
     }
 
-    private static boolean trayIconExists() {
+    /**
+     * Checks whether a tray icon currently exists
+     *
+     * @param trayIcon the icon we're checking for existence
+     * @return whether or not the icon is in the tray
+     */
+    private static boolean windowsTrayIconExists(TrayIcon trayIcon) {
         for (TrayIcon _trayIcon : SystemTray.getSystemTray().getTrayIcons()) {
-            if (WINDOWS_trayIcon == _trayIcon) {
+            if (trayIcon == _trayIcon) {
                 return true;
             }
         }
         return false;
     }
 
+    /**
+     * Sets the environment variable based on detected OS
+     */
     private static void identifyEnvironment() {
         if (SystemUtils.IS_OS_WINDOWS) {
             environment = Environment.WINDOWS;
@@ -177,18 +152,36 @@ class NotificationUtils {
     }
 
     /**
-     * Copies the image from a notification to the system temp directory so we can use it
+     * Copies an image to the system temp directory so we can use it
      * from there. Returns the path to said temp file or null if it failed
      *
-     * @param notification where we're getting our image from
+     * @param image The image to write
      * @return the path to the newly created temp file or null if it fails
      */
-    private static String copyResourceToTemp(Notification notification) {
-        File file;
-        String resource = notification.getImageType().toString();
+    private static String copyResourceToTemp(BufferedImage image) {
         try {
-            InputStream input = XenForoNotifier.class.getClassLoader().getResourceAsStream(resource);
-            file = File.createTempFile(new Date().getTime() + "", ".png");
+            File file = File.createTempFile(new Date().getTime() + "", ".png");
+            ImageIO.write(image, "png", file);
+
+            return file.getPath();
+        } catch (IOException ex) {
+            ex.printStackTrace();
+            return null;
+        }
+    }
+
+    /**
+     * Copies a file to the system temp directory so we can use it
+     * from there. Returns the path to said temp file or null if it failed
+     *
+     * @param inJarPath where we're getting our file from
+     * @param fileType  the file extension to use ** INCLUDES '.' PREFIX **
+     * @return the path to the newly created temp file or null if it fails
+     */
+    private static String copyResourceToTemp(String inJarPath, String fileType) {
+        try {
+            InputStream input = XenForoNotifier.class.getClassLoader().getResourceAsStream(inJarPath);
+            File file = File.createTempFile(new Date().getTime() + "", fileType);
             OutputStream out = new FileOutputStream(file);
             int read;
             byte[] bytes = new byte[1024];
@@ -206,6 +199,19 @@ class NotificationUtils {
             ex.printStackTrace();
             return null;
         }
+    }
+
+    /**
+     * Deep copies a BufferedImage
+     *
+     * @param image BufferedImage to copy
+     * @return a new BufferedImage
+     */
+    static BufferedImage cloneImage (BufferedImage image) {
+        ColorModel cm = image.getColorModel();
+        boolean isAlphaPremultiplied = cm.isAlphaPremultiplied();
+        WritableRaster raster = image.copyData(image.getRaster().createCompatibleWritableRaster());
+        return new BufferedImage(cm, raster, isAlphaPremultiplied, null).getSubimage(0, 0, image.getWidth(), image.getHeight());
     }
 
     private enum Environment {

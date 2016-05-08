@@ -1,9 +1,11 @@
 package com.cldfire.xenforonotifier.util.notifications;
 
+import java.awt.image.BufferedImage;
+
 /**
  * Represents a notification
  */
-public class Notification {
+public class Notification implements Cloneable {
     /**
      * Title for this notification
      */
@@ -15,9 +17,9 @@ public class Notification {
     private final String subtitle;
 
     /**
-     * Type of image associated with this notification
+     * Image associated with this notification
      */
-    private final EnumImageType imageType;
+    private BufferedImage image;
 
     /**
      * Delay (in seconds) this notification will be shown for
@@ -28,10 +30,10 @@ public class Notification {
      * Creates a new notification
      *
      * @param title this notification's title
-     * @param type  this notification's image type
+     * @param image this notification's image
      */
-    public Notification(String title, EnumImageType type) {
-        this(title, null, type);
+    public Notification(String title, BufferedImage image) {
+        this(title, null, image);
     }
 
     /**
@@ -39,10 +41,10 @@ public class Notification {
      *
      * @param title    this notification's title
      * @param subtitle this notification's subtitle
-     * @param type     this notification's image type
+     * @param image    this notification's image
      */
-    public Notification(String title, String subtitle, EnumImageType type) {
-        this(title, subtitle, type, 4); // 4 second default delay time if unspecified
+    public Notification(String title, String subtitle, BufferedImage image) {
+        this(title, subtitle, image, 4); // 4 second default delay time if unspecified
     }
 
     /**
@@ -50,13 +52,13 @@ public class Notification {
      *
      * @param title    this notification's title
      * @param subtitle this notification's subtitle
-     * @param type     this notification's image type
+     * @param image    this notification's image
      * @param delay    this notification's delay
      */
-    public Notification(String title, String subtitle, EnumImageType type, int delay) {
+    public Notification(String title, String subtitle, BufferedImage image, int delay) {
         this.title = title;
         this.subtitle = subtitle;
-        this.imageType = type;
+        this.image = image;
         this.delay = delay;
     }
 
@@ -68,7 +70,7 @@ public class Notification {
     public Notification(NotificationBuilder builder) {
         this.title = builder.title;
         this.subtitle = builder.subtitle;
-        this.imageType = builder.imageType;
+        this.image = builder.image;
         this.delay = builder.delay;
     }
 
@@ -105,12 +107,12 @@ public class Notification {
     }
 
     /**
-     * Gets the image type associated with this notification
+     * Gets the image associated with this notification
      *
-     * @return the type of image for this notification
+     * @return the image for this notification
      */
-    public EnumImageType getImageType() {
-        return this.imageType;
+    public BufferedImage getImage() {
+        return this.image;
     }
 
     /**
@@ -126,7 +128,7 @@ public class Notification {
     public static class NotificationBuilder {
         private String title;
         private String subtitle;
-        private EnumImageType imageType;
+        private BufferedImage image;
         private int delay;
 
         public NotificationBuilder title(String title) {
@@ -139,8 +141,8 @@ public class Notification {
             return this;
         }
 
-        public NotificationBuilder imageType(EnumImageType type) {
-            this.imageType = type;
+        public NotificationBuilder image(BufferedImage image) {
+            this.image = image;
             return this;
         }
 
@@ -152,5 +154,19 @@ public class Notification {
         public Notification build() {
             return new Notification(this);
         }
+    }
+
+    /**
+     * Returns a new Notification that is an exact copy of this one
+     *
+     * @return new Notification that is a copy of this one
+     * @throws CloneNotSupportedException
+     */
+    @Override
+    public Notification clone() throws CloneNotSupportedException {
+        Notification clone = (Notification) super.clone();
+        clone.image = NotificationUtils.cloneImage(this.getImage()); // BufferedImages are not immutable
+
+        return clone;
     }
 }
