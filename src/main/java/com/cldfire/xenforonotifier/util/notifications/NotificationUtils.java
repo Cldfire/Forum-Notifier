@@ -161,6 +161,7 @@ class NotificationUtils {
     private static String copyResourceToTemp(BufferedImage image) {
         try {
             File file = File.createTempFile(new Date().getTime() + "", ".png");
+            file.deleteOnExit();
             ImageIO.write(image, "png", file);
 
             return file.getPath();
