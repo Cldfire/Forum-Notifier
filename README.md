@@ -1,8 +1,13 @@
-#XenForo Notifier
+#Forum Notifier
 
-Notifies users of their XenForo account's Messages and Notifications. This also displays their post and rating count. 
+Notifies users of their Forum account's Messages and Notifications. This also displays their post and rating count. 
 
 Please note that this project is currrently in the early stages of development.
+
+##Forum Softwares:
+- [XenForo](https://xenforo.com) (WIP)
+- [NamelessMC](http://namelessmc.github.io) (PLANNED)
+- Other various popular forum systems. If you would like to suggest one, contact us.
 
 ##Features
 - Notifies user for all notifications.
@@ -19,7 +24,6 @@ Please note that this project is currrently in the early stages of development.
 
 ##Contributions
 For a complete list of the XenForo Notifier contributors, please see [here](https://github.com/Cldfire/XenForo-Notifier/graphs/contributors).
-
 
 
 
