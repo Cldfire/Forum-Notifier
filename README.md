@@ -6,7 +6,7 @@ Please note that this project is currrently in the early stages of development.
 
 ##Forum Softwares:
 - [XenForo](https://xenforo.com) (WIP)
-- [NamelessMC](http://namelessmc.github.io) (PLANNED)
+- [NamelessMC](https://namelessmc.com) (PLANNED)
 - [Enjin](http://www.enjin.com/) (PLANNED)
 - Other various popular forum systems. If you would like to suggest one, contact us.
 
