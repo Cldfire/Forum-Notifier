@@ -1,14 +1,14 @@
 #Forum Notifier
 
-Notifies users of their Forum account's Messages and Notifications. This also displays their post and rating count. 
+Keep tabs on all those forum sites / accounts. Sends you desktop notifications for new alerts, messages and <whatever else>, allows you to change the signature, profile image and more for all (or specific) accounts, displays (and tracks) account stats and more, all in one easy-to-use, clean interface. In addition, a mobile version (for Android and possibly iOS) is a future possiblity.
 
 Please note that this project is currrently in the early stages of development.
 
 ##Forum Softwares:
 - [XenForo](https://xenforo.com) (WIP)
-- [NamelessMC](http://namelessmc.github.io) (PLANNED)
+- [NamelessMC](https://namelessmc.com) (PLANNED)
 - [Enjin](http://www.enjin.com/) (PLANNED)
-- Other various popular forum systems. If you would like to suggest one, contact us.
+- Other various popular forum systems. If you would like to suggest one, create an issue in the issue tracker.
 
 ##Features
 - Notifies user for all notifications.
