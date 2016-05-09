@@ -7,6 +7,7 @@ Please note that this project is currrently in the early stages of development.
 ##Forum Softwares:
 - [XenForo](https://xenforo.com) (WIP)
 - [NamelessMC](http://namelessmc.github.io) (PLANNED)
+- [Enjin](http://www.enjin.com/) (PLANNED)
 - Other various popular forum systems. If you would like to suggest one, contact us.
 
 ##Features
@@ -24,7 +25,6 @@ Please note that this project is currrently in the early stages of development.
 
 ##Contributions
 For a complete list of the XenForo Notifier contributors, please see [here](https://github.com/Cldfire/XenForo-Notifier/graphs/contributors).
-
 
 
 
