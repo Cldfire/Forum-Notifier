@@ -16,7 +16,14 @@ public class RootLayoutController {
 
     @FXML
     private void handleAddAccount() {
-        xenForoNotifier.showLoginView();
+        if (addAccount.getText().equalsIgnoreCase("add")) {
+            xenForoNotifier.showLoginView();
+            addAccount.setText("Cancel");
+        } else {
+            xenForoNotifier.showStatView();
+            addAccount.setText("Add");
+        }
+
     }
 
 }

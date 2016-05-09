@@ -8,13 +8,9 @@ import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 
-/**
- * Created by Cldfire on 4/25/2016.
- */
 public class AccountDisplayBlock extends ListCell<Account> {
 
     private Pane blockPane;
-    private Rectangle backing;
     private Label header;
     private Label alertCount;
     private Label messageCount;
@@ -23,9 +19,6 @@ public class AccountDisplayBlock extends ListCell<Account> {
     public AccountDisplayBlock() {
         blockPane = new AnchorPane();
         blockPane.setPrefSize(760, 100);
-
-        backing = new Rectangle(760, 100, Color.ALICEBLUE);
-        backing.setOpacity(0.9);
 
         header = new Label("...");
         header.setLayoutY(10);
@@ -43,7 +36,6 @@ public class AccountDisplayBlock extends ListCell<Account> {
         favicon.setLayoutY(10);
         favicon.setLayoutX(10);
 
-        blockPane.getChildren().add(backing);
         blockPane.getChildren().add(header);
         blockPane.getChildren().add(alertCount);
         blockPane.getChildren().add(messageCount);
@@ -57,9 +49,9 @@ public class AccountDisplayBlock extends ListCell<Account> {
             setGraphic(null);
             setText(null);
         } else {
-            header.setText(a.getName() + "@" + a.getForum().getUrl());
-            alertCount.setText("Alerts: " + a.getAlertCount().toString());
-            messageCount.setText("Messages " + a.getMessageCount().toString());
+            header.setText(a.getName() + " @ " + a.getForum().getUrl());
+            alertCount.textProperty().bind(a.getAlertProperty());
+            messageCount.textProperty().bind(a.getMessageProperty());
             //favicon.setImage(a.getFavicon());
             setGraphic(blockPane);
         }

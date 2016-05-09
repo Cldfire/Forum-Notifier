@@ -10,6 +10,7 @@ import com.gargoylesoftware.htmlunit.html.HtmlDefinitionDescription;
 import com.gargoylesoftware.htmlunit.html.HtmlInput;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import com.gargoylesoftware.htmlunit.html.HtmlSpan;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -26,7 +27,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import static java.util.concurrent.TimeUnit.SECONDS;
 
 public class StatViewController {
-    private static ObservableList<Account> accountBlocks;
+    private static ObservableList<Account> accountBlocks; // TODO: make sure this is thread-safe
     private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
     @FXML
     private ListView<Account> accountOverview;
@@ -70,7 +71,7 @@ public class StatViewController {
         account.getCookies().forEach(c -> webClient.getCookieManager().addCookie(c));
 
         try {
-            page = webClient.getPage("fixme"); // TODO: <------
+            page = webClient.getPage(account.getForum().getProtocol() + "://" + account.getForum());
             token = page.getFirstByXPath("//*[@id='XenForo']/body/div[1]/aside[2]/div/div/div[1]/div[2]/form/div/input[2]");
 
             webClient.close();
@@ -82,7 +83,7 @@ public class StatViewController {
         return null;
     }
 
-    private Map<String, String> getEverything(Account account, String url) {
+    private Map<String, String> getEverything(Account a) {
         final WebClient webClient = new WebClient(BrowserVersion.CHROME);
         webClient.getOptions().setCssEnabled(false);
         webClient.getOptions().setJavaScriptEnabled(false);
@@ -95,17 +96,22 @@ public class StatViewController {
         Map<String, String> values = new HashMap<>();
 
         // feed the WebClient so that it does what we want it to
-        account.getCookies().forEach(c -> webClient.getCookieManager().addCookie(c));
+        System.out.println("Adding cookies");
+        System.out.println(a.getCookies());
+        a.getCookies().forEach(c -> webClient.getCookieManager().addCookie(c));
+        System.out.println("Added COOKIES");
 
         try {
-            page = webClient.getPage(url);
+            System.out.println("Getting page");
+            page = webClient.getPage(a.getForum().getProtocol() + "://" + a.getForum().getUrl());
+            System.out.println("GOT PAGE");
             webClient.close();
             messages = page.getFirstByXPath("//*[@id='uix_ConversationsMenu_Counter']/span");
             alerts = page.getFirstByXPath("//*[@id='uix_AlertsMenu_Counter']/span");
             ratings = page.getFirstByXPath("//*[@id='XenForo']/body/div[1]/aside[2]/div/div/div[1]/div[1]/div/div/div/dl/dd/span");
             posts = page.getFirstByXPath("//*[@id='XenForo']/body/div[1]/aside[2]/div/div/div[1]/div[1]/div/div/div/div/dl/dd");
 
-            values.put("messages", messages.asText());
+            values.put("messages", messages.asText()); // TODO: Do something if this throws a NPE
             values.put("alerts", alerts.asText());
             values.put("ratings", ratings.asText());
             values.put("posts", posts.asText());
@@ -113,6 +119,7 @@ public class StatViewController {
             return values;
         } catch (Exception e) {
             e.printStackTrace();
+
         }
         webClient.close();
         values.put("messages", "N/A");
@@ -120,7 +127,7 @@ public class StatViewController {
         values.put("ratings", "N/A");
         values.put("posts", "N/A");
         return values;
-    } // TODO: Make it so I only have to pass in an account, same for getXenToken
+    }
 
     private void checkEverythingAtFixedRate() { // TODO: I'm very aware this is not going to thread properly atm, will fix in the future
         Runnable getEverythingRunnable = () -> {
@@ -132,9 +139,9 @@ public class StatViewController {
                 f.getAccounts().forEach(a -> {
                     System.out.println("There were accounts for that site");
                     System.out.println(a.getName());
-                    final Map<String, String> returnedValues = new HashMap<>(getEverything(a, "https://" + f.getUrl()));
-                    final Integer newMessagesCount = Integer.parseInt(returnedValues.get("messages"));
-                    final Integer newAlertsCount = Integer.parseInt(returnedValues.get("alerts"));
+                    final Map<String, String> returnedValues = new HashMap<>(getEverything(a));
+                    final int newMessagesCount = Integer.parseInt(returnedValues.get("messages"));
+                    final int newAlertsCount = Integer.parseInt(returnedValues.get("alerts"));
 
                     if (newMessagesCount > a.getMessageCount()) { // TODO: Get notifications to work when both a message and alert notification needs to be created
                         if (newMessagesCount - a.getMessageCount() == 1) {
@@ -151,8 +158,10 @@ public class StatViewController {
                             new Notification("XenForo Notifier", "You have " + (newAlertsCount - a.getAlertCount()) + " new alerts", notifImage).send();
                         }
                     }
-                    a.setMessageCount(newMessagesCount);
-                    a.setAlertCount(newAlertsCount);
+                    Platform.runLater(() -> {
+                        a.setMessageCount(newMessagesCount);
+                        a.setAlertCount(newAlertsCount);
+                    });
                 });
             });
             System.out.println("Ran checker");

@@ -24,6 +24,7 @@ SOFTWARE.
 
 package com.cldfire.xenforonotifier;
 
+import com.cldfire.xenforonotifier.util.ForumsStore;
 import com.cldfire.xenforonotifier.util.LangUtils;
 import com.cldfire.xenforonotifier.util.LangUtils.Locale;
 import com.cldfire.xenforonotifier.util.Settings;
@@ -49,11 +50,13 @@ public class XenForoNotifier extends Application { // Project started April 1st,
     private AnchorPane statView;
     private AnchorPane loginView;
 
+    private LoginViewController loginViewController;
+
     public static void main(String[] args) {
         launch(args);
     }
 
-    public void initRootLayout() {
+    private void initRootLayout() {
         try {
             FXMLLoader loader = new FXMLLoader();
             loader.setLocation(this.getClass().getClassLoader().getResource("views/RootLayout.fxml"));
@@ -71,19 +74,19 @@ public class XenForoNotifier extends Application { // Project started April 1st,
         }
     }
 
-    public void loadStatView() {
+    private void loadStatView() {
         try {
             FXMLLoader loader = new FXMLLoader();
             loader.setLocation(this.getClass().getClassLoader().getResource("views/StatView.fxml"));
             statView = loader.load();
             BorderPane.setMargin(statView, new Insets(0, 0, 450, 0));
-            new ParticleAnimation(statView);
+            //new ParticleAnimation(statView);
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    public void loadLoginView() {
+    private void loadLoginView() {
         try {
             FXMLLoader loader = new FXMLLoader();
             loader.setLocation(this.getClass().getClassLoader().getResource("views/LoginView.fxml"));
@@ -92,6 +95,7 @@ public class XenForoNotifier extends Application { // Project started April 1st,
 
             LoginViewController controller = loader.getController();
             controller.setXenForoNotifier(this);
+            this.loginViewController = controller;
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -104,6 +108,7 @@ public class XenForoNotifier extends Application { // Project started April 1st,
 
     public void showLoginView() {
         rootLayout.setCenter(loginView);
+        loginViewController.resetForNewLogin();
     }
 
     @Override
@@ -119,7 +124,7 @@ public class XenForoNotifier extends Application { // Project started April 1st,
         Settings.load();
         Settings.versionCheck();
         LangUtils.loadLocale(Locale.valueOf(Settings.get("client.lang")));
-        //ForumsStore.loadForums();
+        ForumsStore.loadForums();
 
         this.primaryStage = primaryStage;
         this.primaryStage.setTitle(LangUtils.translate("window.title"));

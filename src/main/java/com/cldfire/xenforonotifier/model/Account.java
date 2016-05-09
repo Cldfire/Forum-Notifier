@@ -2,28 +2,30 @@ package com.cldfire.xenforonotifier.model;
 
 import com.cldfire.xenforonotifier.util.ForumsStore;
 import com.gargoylesoftware.htmlunit.util.Cookie;
-import javafx.beans.property.IntegerProperty;
-import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
+import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 
 public class Account { // TODO: Make sure all this becomes thread safe at some point or another
     private final StringProperty name;
-    private final IntegerProperty alertCount;
-    private final IntegerProperty messageCount;
+    private final StringProperty alertCountProperty;
+    private final StringProperty messageCountProperty;
+    private int alertCount;
+    private int messageCount;
     private Set<Cookie> cookies;
-    private String connProtocol;
     //private final ObjectProperty<Image> favicon;
 
-    public Account(Set<Cookie> cookies, String name, String connProtocol) {
-        this.cookies = cookies;
-        this.name = new SimpleStringProperty(name);
-        this.connProtocol = connProtocol;
+    public Account(Map<String, Object> accountData) {
+        this.cookies = (Set<Cookie>) accountData.get("cookies");
+        this.name = new SimpleStringProperty((String) accountData.get("name"));
+        alertCount = 0;
+        messageCount = 0;
 
-        alertCount = new SimpleIntegerProperty(0);
-        messageCount = new SimpleIntegerProperty(0);
+        alertCountProperty = new SimpleStringProperty("Alerts: 0");
+        messageCountProperty = new SimpleStringProperty("Messages: 0");
         //favicon = new SimpleObjectProperty<>(image);
     }
 
@@ -54,28 +56,30 @@ public class Account { // TODO: Make sure all this becomes thread safe at some p
         this.name.set(name);
     }
 
-    public String getConnProtocol() {
-        return connProtocol;
+    public int getAlertCount() {
+        return alertCount;
     }
 
-    public void setConnProtocol(String connProtocol) {
-        this.connProtocol = connProtocol;
+    public void setAlertCount(Integer alertCount) {
+        this.alertCount = alertCount;
+        this.alertCountProperty.set("Alerts: " + alertCount.toString());
     }
 
-    public Integer getAlertCount() {
-        return alertCount.get();
+    public StringProperty getAlertProperty() {
+        return alertCountProperty;
     }
 
-    public void setAlertCount(int alertCount) {
-        this.alertCount.set(alertCount);
+    public int getMessageCount() {
+        return messageCount;
     }
 
-    public Integer getMessageCount() {
-        return messageCount.get();
+    public void setMessageCount(Integer messageCount) {
+        this.messageCount = messageCount;
+        this.messageCountProperty.set("Messages: " + messageCount.toString());
     }
 
-    public void setMessageCount(int messageCount) {
-        this.messageCount.set(messageCount);
+    public StringProperty getMessageProperty() {
+        return messageCountProperty;
     }
 
     //public Image getFavicon() {

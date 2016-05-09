@@ -10,6 +10,7 @@ import com.cldfire.xenforonotifier.util.animations.NodeAnimationUtils;
 import com.gargoylesoftware.htmlunit.BrowserVersion;
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.html.*;
+import com.gargoylesoftware.htmlunit.util.Cookie;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -19,6 +20,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -57,7 +59,6 @@ public class LoginViewController {
         loginButton.setText(LangUtils.translate("login.button"));
         authCode.setPromptText(LangUtils.translate("login.authCode"));
         confirmButton.setText(LangUtils.translate("login.confirm"));
-        url.requestFocus();
 
         NodeAnimationUtils.bindFromToAnimation(EnumAnimationType.COLOR_FADE, url, 0.7, new Color(0.3098039215686275, 0.3098039215686275, 0.3098039215686275, 1), new Color(0, 1, 0.9254901960784314, 1));
         NodeAnimationUtils.bindFromToAnimation(EnumAnimationType.COLOR_FADE, username, 0.7, new Color(0.3098039215686275, 0.3098039215686275, 0.3098039215686275, 1), new Color(0, 1, 0.9254901960784314, 1));
@@ -88,28 +89,24 @@ public class LoginViewController {
 
         webClient.getCache().clear();
         webClient.getCookieManager().clearCookies();
-
-        url.requestFocus();
     }
 
     private Boolean testForLoggedIn() { // TODO: Add more ways to detect that a user is logged in
         return webClient.getCookieManager().getCookies().size() > 5 || webClient.getCookieManager().getCookie("xf_user") != null || webClient.getCookieManager().getCookie("xf_user") != null;
     }
 
-    private String getAccountName(String url) { // TODO: Get this working
-        WebClient getNameClient = new WebClient();
-        getNameClient.getOptions().setCssEnabled(false);
-        getNameClient.getOptions().setJavaScriptEnabled(false);
-
-        final HtmlPage page;
+    private String getAccountName(String url) { // TODO: Add more ways to get name
+        HtmlPage page;
         HtmlStrong username;
 
+        try {
+            page = webClient.getPage(url);
+            username = page.getFirstByXPath("//*[@id='userBar']/div/div/div/div/ul[2]/li[1]/a/strong[1]");
+            return username.getTextContent();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return null;
-    }
-
-    private Account getAccountDetails() {
-        //return new Account(webClient.getCookieManager().getCookies(), getAccountName(tempConnProtocol + "://" + url.getText()), tempConnProtocol, getForumFavicon(tempConnProtocol + "://" + url.getText() + "/favicon.ico"));
-        return new Account(webClient.getCookieManager().getCookies(), getAccountName(tempConnProtocol + "://" + url.getText()), tempConnProtocol);
     }
 
     private Image getForumFavicon(String url) {
@@ -255,7 +252,7 @@ public class LoginViewController {
                         System.out.println(f.getUrl());
                         if (f.getUrl().equalsIgnoreCase(url.getText())) {
                             System.out.println("found forum");
-                            Account newAccount = getAccountDetails();
+                            Account newAccount = ForumsStore.createAccount(webClient.getCookieManager().getCookies(), getAccountName(tempConnProtocol + "://" + url.getText()));
                             f.addAccount(newAccount);
                             ForumsStore.saveForums();
                             doesForumExist = true;
@@ -268,11 +265,14 @@ public class LoginViewController {
                     });
 
                     if (!doesForumExist) {
-                        Account newAccount = getAccountDetails();
-                        ForumsStore.addForum(new Forum(url.getText(), Forum.ForumType.XENFORO, tempConnProtocol, newAccount));
+                        Forum addForum = ForumsStore.createForum(url.getText(), Forum.ForumType.XENFORO, tempConnProtocol);
+                        Account addAccount = ForumsStore.createAccount(webClient.getCookieManager().getCookies(), getAccountName(tempConnProtocol + "://" + url.getText()));
+
+                        addForum.addAccount(addAccount);
+                        ForumsStore.addForum(addForum);
 
                         Platform.runLater(() -> {
-                            StatViewController.addAccountBlock(newAccount);
+                            StatViewController.addAccountBlock(addAccount);
                             xenForoNotifier.showStatView();
                             resetForNewLogin();
                         });
@@ -304,8 +304,11 @@ public class LoginViewController {
                 System.out.println("We are logged in");
 
                 ForumsStore.forums.forEach(f -> {
+                    System.out.println("forums for each");
+                    System.out.println(f.getUrl());
                     if (f.getUrl().equalsIgnoreCase(url.getText())) {
-                        Account newAccount = getAccountDetails();
+                        System.out.println("found forum");
+                        Account newAccount = ForumsStore.createAccount(webClient.getCookieManager().getCookies(), getAccountName(tempConnProtocol + "://" + url.getText()));
                         f.addAccount(newAccount);
                         ForumsStore.saveForums();
                         doesForumExist = true;
@@ -318,11 +321,14 @@ public class LoginViewController {
                 });
 
                 if (!doesForumExist) {
-                    Account newAccount = getAccountDetails();
-                    ForumsStore.addForum(new Forum(url.getText(), Forum.ForumType.XENFORO, tempConnProtocol, newAccount));
+                    Forum addForum = ForumsStore.createForum(url.getText(), Forum.ForumType.XENFORO, tempConnProtocol);
+                    Account addAccount = ForumsStore.createAccount(webClient.getCookieManager().getCookies(), getAccountName(tempConnProtocol + "://" + url.getText()));
+
+                    addForum.addAccount(addAccount);
+                    ForumsStore.addForum(addForum);
 
                     Platform.runLater(() -> {
-                        StatViewController.addAccountBlock(newAccount);
+                        StatViewController.addAccountBlock(addAccount);
                         xenForoNotifier.showStatView();
                         resetForNewLogin();
                     });

@@ -5,7 +5,12 @@ import javafx.animation.Interpolator;
 import javafx.animation.PathTransition;
 import javafx.animation.ScaleTransition;
 import javafx.application.Platform;
+import javafx.scene.CacheHint;
+import javafx.scene.Node;
+import javafx.scene.SnapshotParameters;
 import javafx.scene.effect.GaussianBlur;
+import javafx.scene.image.Image;
+import javafx.scene.image.WritableImage;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
@@ -18,9 +23,6 @@ import java.util.Random;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-/**
- * Created by Cldfire on 5/2/2016.
- */
 public class ParticleAnimation {
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
 
@@ -30,9 +32,9 @@ public class ParticleAnimation {
 
             for (int i = randGen.nextInt(30) * 10 + 20; i > 0; i--) {
                 Circle test = createParticle(randGen.nextDouble(), Color.AQUAMARINE);
-               Platform.runLater(() -> {
+                Platform.runLater(() -> {
                     layer.getChildren().add(test);
-               });
+                });
                 animate(test, generateRandomPath(layer));
                 try {
                     Thread.sleep(randGen.nextInt(5));
@@ -51,6 +53,9 @@ public class ParticleAnimation {
         returnCircle.setTranslateX(randGen.nextInt(800));
         returnCircle.setTranslateY(randGen.nextInt(500));
         returnCircle.setEffect(new GaussianBlur(randGen.nextInt(10) + 1));
+
+        returnCircle.setCache(true);
+        returnCircle.setCacheHint(CacheHint.QUALITY);
         return returnCircle;
     }
 
@@ -77,11 +82,11 @@ public class ParticleAnimation {
     private Path generateRandomPath(Pane layer) {
         Random randGen = new Random();
 
-        int dimensionX = (int) layer.getPrefWidth();
+        int dimensionX = (int) layer.getPrefWidth(); // TODO: Have this not use prefWidth / Height
         int dimensionY = (int) layer.getPrefHeight();
         int pathPointNum = randGen.nextInt(50) + randGen.nextInt(20) + 5;
         Path particlePath = new Path();
-        particlePath.getElements().add(new MoveTo(randGen.nextInt(800), randGen.nextInt(500)));
+        particlePath.getElements().add(new MoveTo(randGen.nextInt(dimensionX), randGen.nextInt(dimensionY)));
 
         for (int i = pathPointNum; i > 0; i--) {
             particlePath.getElements().add(new CubicCurveTo(randGen.nextInt(500), randGen.nextInt(500), randGen.nextInt(500), randGen.nextInt(500), randGen.nextInt(dimensionX), randGen.nextInt(dimensionY)));
@@ -89,4 +94,18 @@ public class ParticleAnimation {
         return particlePath;
     }
 
+    private Image createImage(Node node) {
+        WritableImage wi;
+
+        SnapshotParameters parameters = new SnapshotParameters();
+        parameters.setFill(Color.TRANSPARENT);
+
+        int imageWidth = (int) node.getBoundsInLocal().getWidth();
+        int imageHeight = (int) node.getBoundsInLocal().getHeight();
+
+        wi = new WritableImage(imageWidth, imageHeight);
+        node.snapshot(parameters, wi);
+
+        return wi;
+    }
 }
