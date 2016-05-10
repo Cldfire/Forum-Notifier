@@ -49,6 +49,7 @@ public class LoginViewController {
     private boolean doesForumExist;
 
     public void initialize() {
+        RootLayoutController.setLoginViewController(this);
         errorLabel.setText(LangUtils.translate("login.errorLabel"));
         url.setPromptText(LangUtils.translate("login.url"));
         validateButton.setText(LangUtils.translate("login.validate"));

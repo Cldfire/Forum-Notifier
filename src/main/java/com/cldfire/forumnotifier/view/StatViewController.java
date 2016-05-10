@@ -57,7 +57,7 @@ public class StatViewController {
 
         accountOverview.setCellFactory((ListView<Account> l) -> new AccountDisplayBlock());
         accountOverview.setItems(accountBlocks);
-        //checkEverythingAtFixedRate();
+        checkEverythingAtFixedRate();
     }
 
     private String getXenToken(Account account) {

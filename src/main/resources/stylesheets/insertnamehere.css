@@ -26,7 +26,7 @@
 }
 
 .label-subtle {
-    -fx-text-fill: derive(white,-30%);
+    -fx-text-fill: #7c7c7c;
 }
 
 .label-accent {

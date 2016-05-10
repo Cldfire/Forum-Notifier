@@ -56,10 +56,10 @@ public class AccountDisplayBlock extends ListCell<Account> {
         Text messageIcon = new Text("  " + EnumGoogleIcon.MESSAGE.get() + " ");
         messageCount = new Text("0");
 
-        notificationIcon.setStyle("-fx-font-family: \'Material Icons\'; -fx-font-size: 16; -fx-fill: white;");
-        alertCount.setStyle("-fx-font-family: \'Segoe UI\'; -fx-font-size: 16; -fx-fill: #00ffec;");
-        messageIcon.setStyle("-fx-font-family: \'Material Icons\'; -fx-font-size: 16; -fx-fill: white;");
-        messageCount.setStyle("-fx-font-family: \'Segoe UI\'; -fx-font-size: 16; -fx-fill: #00ffec;");
+        notificationIcon.setStyle("-fx-font-family: 'Material Icons'; -fx-font-size: 16; -fx-fill: white;");
+        messageIcon.setStyle("-fx-font-family: 'Material Icons'; -fx-font-size: 16; -fx-fill: white;");
+        alertCount.setStyle("-fx-font-family: 'Segoe UI'; -fx-font-size: 16; -fx-fill: #7c7c7c;"); // #00ffec
+        messageCount.setStyle("-fx-font-family: 'Segoe UI'; -fx-font-size: 16; -fx-fill: #7c7c7c;");
 
         newNotifications = new TextFlow(notificationIcon, alertCount, messageIcon, messageCount);
         newNotifications.setLayoutY(65);
@@ -86,6 +86,7 @@ public class AccountDisplayBlock extends ListCell<Account> {
             setGraphic(null);
             setText(null);
         } else {
+            System.out.println("UPDATING LIST VIIIIIIEW");
             accountName.setText(a.getName());
             forumUrl.setText(a.getForum().getUrl());
             accountPic.setImage(a.getAccountPic());
@@ -95,7 +96,13 @@ public class AccountDisplayBlock extends ListCell<Account> {
                 a.getAlertProperty().addListener(new ChangeListener<String>() {
                     @Override
                     public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-
+                        if (Integer.parseInt(newValue) > 0) {
+                            alertCount.setText(newValue);
+                            alertCount.setStyle("-fx-font-family: 'Segoe UI'; -fx-font-size: 16; -fx-fill: #00ffec;");
+                        } else {
+                            alertCount.setText(newValue);
+                            alertCount.setStyle("-fx-font-family: 'Segoe UI'; -fx-font-size: 16; -fx-fill: #7c7c7c;");
+                        }
 
                     }
                 });
@@ -103,9 +110,15 @@ public class AccountDisplayBlock extends ListCell<Account> {
                 a.getMessageProperty().addListener(new ChangeListener<String>() {
                     @Override
                     public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+                        if (Integer.parseInt(newValue) > 0) {
+                            messageCount.setText(newValue);
+                            messageCount.setStyle("-fx-font-family: 'Segoe UI'; -fx-font-size: 16; -fx-fill: #00ffec;");
+                        } else {
+                            messageCount.setText(newValue);
+                            messageCount.setStyle("-fx-font-family: 'Segoe UI'; -fx-font-size: 16; -fx-fill: #7c7c7c;");
+                        }
                     }
                 });
-
                 areListenersSet = true;
             }
         }

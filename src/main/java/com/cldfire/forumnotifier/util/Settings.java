@@ -35,7 +35,7 @@ public class Settings { // TODO: Clean this up
                 Properties tmpProperties = new Properties();
                 tmpProperties.load(inputStream);
                 FileOutputStream fileOutputStream = new FileOutputStream(new File(ForumNotifier.APP_DIR, "settings.properties"));
-                tmpProperties.store(fileOutputStream, "XenForo Notifier");
+                tmpProperties.store(fileOutputStream, "Forum Notifier");
                 fileOutputStream.close();
                 load();
             }
@@ -53,7 +53,7 @@ public class Settings { // TODO: Clean this up
     public static void save() { // TODO: Use this
         try {
             FileOutputStream fileOutputStream = new FileOutputStream(new File(ForumNotifier.APP_DIR, "settings.properties"));
-            properties.store(fileOutputStream, "XenForo Notifier");
+            properties.store(fileOutputStream, "Forum Notifier");
             fileOutputStream.close();
         } catch (IOException e) {
             e.printStackTrace();

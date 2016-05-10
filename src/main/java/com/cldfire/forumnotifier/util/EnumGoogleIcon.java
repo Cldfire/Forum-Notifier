@@ -5,7 +5,7 @@ package com.cldfire.forumnotifier.util;
  */
 public enum EnumGoogleIcon {
 
-    NOTIFICATIONS("\uE7F4"), MESSAGE("\uE0C9");
+    NOTIFICATIONS("\uE7F4"), MESSAGE("\uE0C9"), ADD("\uE145"), ADD_BOX("\uE146"), BACKSPACE("\uE14A");
 
     private final String unicode;
 

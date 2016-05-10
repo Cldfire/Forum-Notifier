@@ -10,3 +10,6 @@ login.confirm=Confirm
 login.errorLabel=Invalid credentials
 login.errorLabel.authCode=Invalid code
 login.errorLabel.other=An error has occurred, please try again later
+
+statview.addaccount.add=account
+statview.addaccount.cancel=cancel
