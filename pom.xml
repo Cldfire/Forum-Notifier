@@ -4,7 +4,7 @@
     <groupId>com.cldfire.xenforonotifier</groupId>
     <packaging>jar</packaging>
     <version>1.0-SNAPSHOT</version>
-    <artifactId>Xenforo-Notifier</artifactId>
+    <artifactId>Forum-Notifier</artifactId>
 
     <repositories>
         <repository>
@@ -80,5 +80,4 @@
             <scope>compile</scope>
         </dependency>
     </dependencies>
-
 </project>

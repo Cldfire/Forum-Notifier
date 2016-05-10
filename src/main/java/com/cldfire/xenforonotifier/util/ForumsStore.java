@@ -70,7 +70,7 @@ public class ForumsStore { // TODO: Add things, idk what to add
                             }
 
                         });
-                        testForum.addAccount(createAccount(cookies, (String) a.get("name")));
+                        testForum.addAccount(createAccount(cookies, (String) a.get("name"), (String) a.get("picUrl")));
                     });
                     forums.add(testForum);
                 });
@@ -124,12 +124,13 @@ public class ForumsStore { // TODO: Add things, idk what to add
         return new Forum(returnForumData);
     }
 
-    public static Account createAccount(Set<Cookie> cookies, String name) {
+    public static Account createAccount(Set<Cookie> cookies, String name, String picUrl) {
         //return new Account(webClient.getCookieManager().getCookies(), getAccountName(tempConnProtocol + "://" + url.getText()), tempConnProtocol, getForumFavicon(tempConnProtocol + "://" + url.getText() + "/favicon.ico"));
         Map<String, Object> returnAccountData = new HashMap<>();
 
         returnAccountData.put("cookies", cookies);
         returnAccountData.put("name", name);
+        returnAccountData.put("picUrl", picUrl);
 
         return new Account(returnAccountData);
     }

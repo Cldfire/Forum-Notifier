@@ -10,18 +10,38 @@
     -fx-background-color: transparent;
 }
 
+.rectangle {
+    -fx-background-color: red;
+}
+
 .label {
     -fx-font-size: 10pt;
     -fx-text-fill: white;
     -fx-font-family: "Segoe UI";
-    -fx-opacity: 1;
+}
+
+.label-header {
+    -fx-font-size: 16pt;
+    -fx-font-smoothing-type: gray;
+}
+
+.label-subtle {
+    -fx-text-fill: derive(white,-30%);
+}
+
+.label-accent {
+    -fx-text-fill: -fx-accent;
 }
 
 .error-label {
-    -fx-font-size: 9pt;
+    -fx-font-size: 10pt;
     -fx-text-fill: #ff5757;
     -fx-font-family: "Segoe UI";
     -fx-opacity: 1;
+}
+
+.text{
+    -fx-font-smoothing-type: gray;
 }
 
 .text-input {
@@ -30,7 +50,7 @@
     -fx-border-width: 1;
     -fx-background-color: transparent;
     -fx-font-family: "Segoe UI";
-    -fx-font-size: 10pt;
+    -fx-font-size: 9.5pt;
     -fx-text-fill: #d8d8d8;
 }
 
@@ -47,7 +67,7 @@
     -fx-background-radius: 20;
     -fx-background-color: transparent;
     -fx-font-family: "Segoe UI";
-    -fx-font-size: 9pt;
+    -fx-font-size: 10pt;
     -fx-text-fill: #d8d8d8;
 }
 

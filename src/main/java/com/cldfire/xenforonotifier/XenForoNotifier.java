@@ -63,6 +63,7 @@ public class XenForoNotifier extends Application { // Project started April 1st,
             rootLayout = loader.load();
 
             Scene scene = new Scene(rootLayout);
+            scene.getStylesheets().add("http://fonts.googleapis.com/css?family=Material+Icons");
             primaryStage.setScene(scene);
 
             RootLayoutController controller = loader.getController();

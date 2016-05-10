@@ -2,8 +2,11 @@ package com.cldfire.xenforonotifier.model;
 
 import com.cldfire.xenforonotifier.util.ForumsStore;
 import com.gargoylesoftware.htmlunit.util.Cookie;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import javafx.scene.image.Image;
 
 import java.util.Map;
 import java.util.Set;
@@ -16,17 +19,19 @@ public class Account { // TODO: Make sure all this becomes thread safe at some p
     private int alertCount;
     private int messageCount;
     private Set<Cookie> cookies;
-    //private final ObjectProperty<Image> favicon;
+    private final ObjectProperty<Image> accountPic;
+    private String picUrl;
 
     public Account(Map<String, Object> accountData) {
         this.cookies = (Set<Cookie>) accountData.get("cookies");
         this.name = new SimpleStringProperty((String) accountData.get("name"));
+        this.accountPic = new SimpleObjectProperty<>(new Image((String) accountData.get("picUrl")));
+        picUrl = (String) accountData.get("picUrl");
         alertCount = 0;
         messageCount = 0;
 
         alertCountProperty = new SimpleStringProperty("Alerts: 0");
         messageCountProperty = new SimpleStringProperty("Messages: 0");
-        //favicon = new SimpleObjectProperty<>(image);
     }
 
     public Forum getForum() {
@@ -82,11 +87,19 @@ public class Account { // TODO: Make sure all this becomes thread safe at some p
         return messageCountProperty;
     }
 
-    //public Image getFavicon() {
-    //    return favicon.get();
-    //}
+    public String getPicUrl() {
+        return picUrl;
+    }
 
-    // public void setFavicon(Image favicon) {
-    //    this.favicon.set(favicon);
-    //}
+    public void setPicUrl(String picUrl) {
+        this.picUrl = picUrl;
+    }
+
+    public Image getAccountPic() {
+        return accountPic.get();
+    }
+
+    public void setAccountPic(Image accountPic) {
+        this.accountPic.set(accountPic);
+    }
 }

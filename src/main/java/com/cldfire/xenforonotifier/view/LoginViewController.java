@@ -10,17 +10,13 @@ import com.cldfire.xenforonotifier.util.animations.NodeAnimationUtils;
 import com.gargoylesoftware.htmlunit.BrowserVersion;
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.html.*;
-import com.gargoylesoftware.htmlunit.util.Cookie;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
-import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
-
-import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -66,7 +62,7 @@ public class LoginViewController {
         NodeAnimationUtils.bindFromToAnimation(EnumAnimationType.COLOR_FADE, authCode, 0.7, new Color(0.3098039215686275, 0.3098039215686275, 0.3098039215686275, 1), new Color(0, 1, 0.9254901960784314, 1));
     }
 
-    public void setXenForoNotifier(XenForoNotifier xenForoNotifier) {
+    public void setXenForoNotifier(final XenForoNotifier xenForoNotifier) {
         this.xenForoNotifier = xenForoNotifier;
     }
 
@@ -95,25 +91,42 @@ public class LoginViewController {
         return webClient.getCookieManager().getCookies().size() > 5 || webClient.getCookieManager().getCookie("xf_user") != null || webClient.getCookieManager().getCookie("xf_user") != null;
     }
 
-    private String getAccountName(String url) { // TODO: Add more ways to get name
+    private String getAccountName(final String url) { // TODO: Clean up ways to get name (create method to loop through list of xpaths)
         HtmlPage page;
         HtmlStrong username;
 
         try {
             page = webClient.getPage(url);
+
             username = page.getFirstByXPath("//*[@id='userBar']/div/div/div/div/ul[2]/li[1]/a/strong[1]");
-            return username.getTextContent();
+            if (username != null) {return username.getTextContent();}
+            username = page.getFirstByXPath("//*[@id='userBar']/div/div/div/div/ul/li[1]/a/strong[1]");
+            if (username != null) {return username.getTextContent();}
         } catch (Exception e) {
             e.printStackTrace();
         }
         return null;
     }
 
-    private Image getForumFavicon(String url) {
-        return new Image("C:\\Users\\Jarek Samic\\Documents\\IDEA Projects\\XenForo-Notifier\\src\\main\\resources\\images\\notification-bell.png"); // this is temporary, you can thank Java's lack of support for .ico
+    private String getAccountPicUrl(final String url) {
+        HtmlPage page;
+        HtmlAnchor profileUrl;
+        HtmlImage image;
+
+        try {
+            page = webClient.getPage(url);
+            profileUrl = page.getFirstByXPath("//*[@id='AccountMenu']/div[1]/ul/li/a");
+
+            page = webClient.getPage(url + "/" + profileUrl.getAttribute("href"));
+            image = page.getFirstByXPath("//*[@id='content']/div/div/div[2]/div/div[1]/div[1]/a/img");
+            return image.getAttribute("src");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null; // TODO: Return some default placeholder image
     }
 
-    private HtmlPage loginToSite(String url, String email, String password) {
+    private HtmlPage loginToSite(final String url, final String email, final String password) {
         webClient.getOptions().setCssEnabled(false);
         webClient.getOptions().setJavaScriptEnabled(false);
 
@@ -147,7 +160,7 @@ public class LoginViewController {
         }
     }
 
-    private HtmlPage loginTwoFactorAuth(String url, String code) {
+    private HtmlPage loginTwoFactorAuth(final String url, final String code) {
         webClient.getOptions().setCssEnabled(false);
         webClient.getOptions().setJavaScriptEnabled(false);
 
@@ -174,7 +187,7 @@ public class LoginViewController {
         }
     }
 
-    private Boolean validateSite(String url) {
+    private Boolean validateSite(final String url) {
         WebClient validateClient = new WebClient();
         validateClient.getOptions().setCssEnabled(false);
         validateClient.getOptions().setJavaScriptEnabled(false);
@@ -252,7 +265,7 @@ public class LoginViewController {
                         System.out.println(f.getUrl());
                         if (f.getUrl().equalsIgnoreCase(url.getText())) {
                             System.out.println("found forum");
-                            Account newAccount = ForumsStore.createAccount(webClient.getCookieManager().getCookies(), getAccountName(tempConnProtocol + "://" + url.getText()));
+                            Account newAccount = ForumsStore.createAccount(webClient.getCookieManager().getCookies(), getAccountName(tempConnProtocol + "://" + url.getText()), getAccountPicUrl(tempConnProtocol + "://" + url.getText()));
                             f.addAccount(newAccount);
                             ForumsStore.saveForums();
                             doesForumExist = true;
@@ -266,7 +279,7 @@ public class LoginViewController {
 
                     if (!doesForumExist) {
                         Forum addForum = ForumsStore.createForum(url.getText(), Forum.ForumType.XENFORO, tempConnProtocol);
-                        Account addAccount = ForumsStore.createAccount(webClient.getCookieManager().getCookies(), getAccountName(tempConnProtocol + "://" + url.getText()));
+                        Account addAccount = ForumsStore.createAccount(webClient.getCookieManager().getCookies(), getAccountName(tempConnProtocol + "://" + url.getText()), getAccountPicUrl(tempConnProtocol + "://" + url.getText()));
 
                         addForum.addAccount(addAccount);
                         ForumsStore.addForum(addForum);
@@ -308,7 +321,7 @@ public class LoginViewController {
                     System.out.println(f.getUrl());
                     if (f.getUrl().equalsIgnoreCase(url.getText())) {
                         System.out.println("found forum");
-                        Account newAccount = ForumsStore.createAccount(webClient.getCookieManager().getCookies(), getAccountName(tempConnProtocol + "://" + url.getText()));
+                        Account newAccount = ForumsStore.createAccount(webClient.getCookieManager().getCookies(), getAccountName(tempConnProtocol + "://" + url.getText()), getAccountPicUrl(tempConnProtocol + "://" + url.getText()));
                         f.addAccount(newAccount);
                         ForumsStore.saveForums();
                         doesForumExist = true;
@@ -322,7 +335,7 @@ public class LoginViewController {
 
                 if (!doesForumExist) {
                     Forum addForum = ForumsStore.createForum(url.getText(), Forum.ForumType.XENFORO, tempConnProtocol);
-                    Account addAccount = ForumsStore.createAccount(webClient.getCookieManager().getCookies(), getAccountName(tempConnProtocol + "://" + url.getText()));
+                    Account addAccount = ForumsStore.createAccount(webClient.getCookieManager().getCookies(), getAccountName(tempConnProtocol + "://" + url.getText()), getAccountPicUrl(tempConnProtocol + "://" + url.getText()));
 
                     addForum.addAccount(addAccount);
                     ForumsStore.addForum(addForum);

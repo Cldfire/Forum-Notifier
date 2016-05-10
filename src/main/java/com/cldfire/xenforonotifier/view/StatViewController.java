@@ -57,7 +57,7 @@ public class StatViewController {
 
         accountOverview.setCellFactory((ListView<Account> l) -> new AccountDisplayBlock());
         accountOverview.setItems(accountBlocks);
-        checkEverythingAtFixedRate();
+        //checkEverythingAtFixedRate();
     }
 
     private String getXenToken(Account account) {
@@ -96,15 +96,11 @@ public class StatViewController {
         Map<String, String> values = new HashMap<>();
 
         // feed the WebClient so that it does what we want it to
-        System.out.println("Adding cookies");
         System.out.println(a.getCookies());
         a.getCookies().forEach(c -> webClient.getCookieManager().addCookie(c));
-        System.out.println("Added COOKIES");
 
         try {
-            System.out.println("Getting page");
             page = webClient.getPage(a.getForum().getProtocol() + "://" + a.getForum().getUrl());
-            System.out.println("GOT PAGE");
             webClient.close();
             messages = page.getFirstByXPath("//*[@id='uix_ConversationsMenu_Counter']/span");
             alerts = page.getFirstByXPath("//*[@id='uix_AlertsMenu_Counter']/span");
@@ -132,9 +128,8 @@ public class StatViewController {
     private void checkEverythingAtFixedRate() { // TODO: I'm very aware this is not going to thread properly atm, will fix in the future
         Runnable getEverythingRunnable = () -> {
             ForumsStore.forums.forEach(f -> {
-                System.out.println(ForumsStore.forums.size());
-                System.out.println(ForumsStore.forums);
                 System.out.println("Forum list had something");
+                System.out.println("Size: " + ForumsStore.forums.size());
 
                 f.getAccounts().forEach(a -> {
                     System.out.println("There were accounts for that site");
@@ -167,6 +162,6 @@ public class StatViewController {
             System.out.println("Ran checker");
         };
         // TODO: Provide way to cancel this other than task manager / force quit / whatever *nix does
-        scheduler.scheduleAtFixedRate(getEverythingRunnable, 0, 15, SECONDS);
+        scheduler.scheduleAtFixedRate(getEverythingRunnable, 0, 30, SECONDS);
     }
 }
