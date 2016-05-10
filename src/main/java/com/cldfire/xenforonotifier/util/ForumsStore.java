@@ -46,7 +46,7 @@ public class ForumsStore { // TODO: Add things, idk what to add
             if (forumData != null) {
                 forumData.forEach(f -> {
 
-                    Forum testForum = createForum((String) f.get("url"), Forum.ForumType.XENFORO, (String) f.get("protocol"));
+                    Forum addForum = createForum((String) f.get("url"), Forum.ForumType.XENFORO, (String) f.get("protocol"));
                     List<Map<String, Object>> accountData = new ArrayList<>((List<Map<String, Object>>) f.get("accounts"));
 
                     accountData.forEach(a -> {
@@ -55,12 +55,12 @@ public class ForumsStore { // TODO: Add things, idk what to add
 
                         cookieDataMap.forEach(c -> {
                             SimpleDateFormat formatter = new SimpleDateFormat("MMM dd, yyyy HH:mm:ss a");
-                            System.out.println(c.keySet());
                             String expiresText = (String) c.get("expires");
+
                             try {
                                 Date expires;
                                 if (expiresText != null) {
-                                     expires = formatter.parse(expiresText);
+                                    expires = formatter.parse(expiresText);
                                     cookies.add(new Cookie((String) c.get("domain"), (String) c.get("name"), (String) c.get("value"), (String) c.get("path"), expires, true));
                                 } else {
                                     cookies.add(new Cookie((String) c.get("domain"), (String) c.get("name"), (String) c.get("value"), (String) c.get("path"), null, true));
@@ -68,11 +68,10 @@ public class ForumsStore { // TODO: Add things, idk what to add
                             } catch (ParseException e) {
                                 e.printStackTrace();
                             }
-
                         });
-                        testForum.addAccount(createAccount(cookies, (String) a.get("name"), (String) a.get("picUrl")));
+                        addForum.addAccount(createAccount(cookies, (String) a.get("name"), (String) a.get("picFilePath")));
                     });
-                    forums.add(testForum);
+                    forums.add(addForum);
                 });
             }
         }
@@ -124,13 +123,12 @@ public class ForumsStore { // TODO: Add things, idk what to add
         return new Forum(returnForumData);
     }
 
-    public static Account createAccount(Set<Cookie> cookies, String name, String picUrl) {
-        //return new Account(webClient.getCookieManager().getCookies(), getAccountName(tempConnProtocol + "://" + url.getText()), tempConnProtocol, getForumFavicon(tempConnProtocol + "://" + url.getText() + "/favicon.ico"));
+    public static Account createAccount(Set<Cookie> cookies, String name, String picFilePath) {
         Map<String, Object> returnAccountData = new HashMap<>();
 
         returnAccountData.put("cookies", cookies);
         returnAccountData.put("name", name);
-        returnAccountData.put("picUrl", picUrl);
+        returnAccountData.put("picFilePath", picFilePath);
 
         return new Account(returnAccountData);
     }

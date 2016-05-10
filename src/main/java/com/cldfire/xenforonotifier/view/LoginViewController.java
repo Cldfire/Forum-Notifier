@@ -17,6 +17,8 @@ import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.paint.Color;
+
+import java.io.File;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -108,18 +110,29 @@ public class LoginViewController {
         return null;
     }
 
-    private String getAccountPicUrl(final String url) {
+    private String getAccountPic(final String url) {
+        File imageFolder;
+        File imageFile;
         HtmlPage page;
         HtmlAnchor profileUrl;
         HtmlImage image;
 
         try {
+            imageFolder = new File(XenForoNotifier.APP_DIR, "account_images");
+            imageFile = new File(imageFolder, this.url.getText() + "_" + username.getText());
+
+            if (!imageFolder.exists()) {
+                imageFolder.mkdir();
+            }
+
             page = webClient.getPage(url);
             profileUrl = page.getFirstByXPath("//*[@id='AccountMenu']/div[1]/ul/li/a");
 
             page = webClient.getPage(url + "/" + profileUrl.getAttribute("href"));
             image = page.getFirstByXPath("//*[@id='content']/div/div/div[2]/div/div[1]/div[1]/a/img");
-            return image.getAttribute("src");
+            image.saveAs(imageFile);
+
+            return imageFile.getPath();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -265,7 +278,7 @@ public class LoginViewController {
                         System.out.println(f.getUrl());
                         if (f.getUrl().equalsIgnoreCase(url.getText())) {
                             System.out.println("found forum");
-                            Account newAccount = ForumsStore.createAccount(webClient.getCookieManager().getCookies(), getAccountName(tempConnProtocol + "://" + url.getText()), getAccountPicUrl(tempConnProtocol + "://" + url.getText()));
+                            Account newAccount = ForumsStore.createAccount(webClient.getCookieManager().getCookies(), getAccountName(tempConnProtocol + "://" + url.getText()), getAccountPic(tempConnProtocol + "://" + url.getText()));
                             f.addAccount(newAccount);
                             ForumsStore.saveForums();
                             doesForumExist = true;
@@ -279,7 +292,7 @@ public class LoginViewController {
 
                     if (!doesForumExist) {
                         Forum addForum = ForumsStore.createForum(url.getText(), Forum.ForumType.XENFORO, tempConnProtocol);
-                        Account addAccount = ForumsStore.createAccount(webClient.getCookieManager().getCookies(), getAccountName(tempConnProtocol + "://" + url.getText()), getAccountPicUrl(tempConnProtocol + "://" + url.getText()));
+                        Account addAccount = ForumsStore.createAccount(webClient.getCookieManager().getCookies(), getAccountName(tempConnProtocol + "://" + url.getText()), getAccountPic(tempConnProtocol + "://" + url.getText()));
 
                         addForum.addAccount(addAccount);
                         ForumsStore.addForum(addForum);
@@ -321,7 +334,7 @@ public class LoginViewController {
                     System.out.println(f.getUrl());
                     if (f.getUrl().equalsIgnoreCase(url.getText())) {
                         System.out.println("found forum");
-                        Account newAccount = ForumsStore.createAccount(webClient.getCookieManager().getCookies(), getAccountName(tempConnProtocol + "://" + url.getText()), getAccountPicUrl(tempConnProtocol + "://" + url.getText()));
+                        Account newAccount = ForumsStore.createAccount(webClient.getCookieManager().getCookies(), getAccountName(tempConnProtocol + "://" + url.getText()), getAccountPic(tempConnProtocol + "://" + url.getText()));
                         f.addAccount(newAccount);
                         ForumsStore.saveForums();
                         doesForumExist = true;
@@ -335,7 +348,7 @@ public class LoginViewController {
 
                 if (!doesForumExist) {
                     Forum addForum = ForumsStore.createForum(url.getText(), Forum.ForumType.XENFORO, tempConnProtocol);
-                    Account addAccount = ForumsStore.createAccount(webClient.getCookieManager().getCookies(), getAccountName(tempConnProtocol + "://" + url.getText()), getAccountPicUrl(tempConnProtocol + "://" + url.getText()));
+                    Account addAccount = ForumsStore.createAccount(webClient.getCookieManager().getCookies(), getAccountName(tempConnProtocol + "://" + url.getText()), getAccountPic(tempConnProtocol + "://" + url.getText()));
 
                     addForum.addAccount(addAccount);
                     ForumsStore.addForum(addForum);

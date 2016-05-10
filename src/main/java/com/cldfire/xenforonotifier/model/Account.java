@@ -20,13 +20,13 @@ public class Account { // TODO: Make sure all this becomes thread safe at some p
     private int messageCount;
     private Set<Cookie> cookies;
     private final ObjectProperty<Image> accountPic;
-    private String picUrl;
+    private String picFilePath;
 
     public Account(Map<String, Object> accountData) {
         this.cookies = (Set<Cookie>) accountData.get("cookies");
         this.name = new SimpleStringProperty((String) accountData.get("name"));
-        this.accountPic = new SimpleObjectProperty<>(new Image((String) accountData.get("picUrl")));
-        picUrl = (String) accountData.get("picUrl");
+        this.accountPic = new SimpleObjectProperty<>(new Image("file:" + accountData.get("picFilePath")));
+        picFilePath = (String) accountData.get("picFilePath");
         alertCount = 0;
         messageCount = 0;
 
@@ -87,12 +87,12 @@ public class Account { // TODO: Make sure all this becomes thread safe at some p
         return messageCountProperty;
     }
 
-    public String getPicUrl() {
-        return picUrl;
+    public String getPicFilePath() {
+        return picFilePath;
     }
 
-    public void setPicUrl(String picUrl) {
-        this.picUrl = picUrl;
+    public void setPicFilePath(String picFilePath) {
+        this.picFilePath = picFilePath;
     }
 
     public Image getAccountPic() {

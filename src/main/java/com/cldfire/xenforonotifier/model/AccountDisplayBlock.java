@@ -53,9 +53,9 @@ public class AccountDisplayBlock extends ListCell<Account> {
         forumUrl.setLayoutX(85);
 
         Text notificationIcon = new Text(EnumGoogleIcon.NOTIFICATIONS.get() + " ");
-        alertCount = new Text("0");
+        alertCount = new Text("5");
         Text messageIcon = new Text("  " + EnumGoogleIcon.MESSAGE.get() + " ");
-        messageCount = new Text("0");
+        messageCount = new Text("2");
 
         notificationIcon.setStyle("-fx-font-family: \'Material Icons\'; -fx-font-size: 16; -fx-fill: white;");
         alertCount.setStyle("-fx-font-family: \'Segoe UI\'; -fx-font-size: 16; -fx-fill: #00ffec;");
@@ -68,7 +68,9 @@ public class AccountDisplayBlock extends ListCell<Account> {
 
         accountPic = new ImageView();
         accountPic.setLayoutY(10);
-        accountPic.setLayoutX(10);
+        accountPic.setFitHeight(80);
+        accountPic.setFitWidth(80);
+        accountPic.setPreserveRatio(true);
 
         blockPane.getChildren().add(backing);
         blockPane.getChildren().add(divider);

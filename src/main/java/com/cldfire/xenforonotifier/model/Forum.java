@@ -45,7 +45,7 @@ public class Forum {
 
             ad.put("name", a.getName());
             ad.put("cookies", cd);
-            ad.put("picUrl", a.getPicUrl());
+            ad.put("picFilePath", a.getPicFilePath());
 
             accountData.add(ad);
         });
