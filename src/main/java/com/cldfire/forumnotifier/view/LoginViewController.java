@@ -75,6 +75,7 @@ public class LoginViewController {
         authCode.setVisible(false);
         confirmButton.setVisible(false);
         password.setVisible(false);
+        loginButton.setVisible(false);
         url.setVisible(true);
 
         url.setText("");
