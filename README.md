@@ -1,6 +1,6 @@
 #Forum Notifier
 
-Keep tabs on all those forum sites / accounts. Sends you desktop notifications for new alerts, messages and <whatever else>, allows you to change the signature, profile image and more for all (or specific) accounts, displays (and tracks) account stats and more, all in one easy-to-use, clean interface. In addition, a mobile version (for Android and possibly iOS) is a future possiblity.
+Keep tabs on all those forum sites / accounts. Sends you desktop notifications for new alerts, messages and \<whatever else\>, allows you to change the signature, profile image and more for all (or specific) accounts, displays (and tracks) account stats and more, all in one easy-to-use, clean interface. In addition, a mobile version (for Android and possibly iOS) is a future possiblity.
 
 Please note that this project is currrently in the early stages of development.
 
