@@ -1,4 +1,4 @@
-package com.cldfire.xenforonotifier.util.animations;
+package com.cldfire.forumnotifier.util.animations;
 
 public enum EnumAnimationType {
 

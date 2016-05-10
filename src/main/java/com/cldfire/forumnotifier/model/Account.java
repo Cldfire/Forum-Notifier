@@ -1,6 +1,6 @@
-package com.cldfire.xenforonotifier.model;
+package com.cldfire.forumnotifier.model;
 
-import com.cldfire.xenforonotifier.util.ForumsStore;
+import com.cldfire.forumnotifier.util.ForumsStore;
 import com.gargoylesoftware.htmlunit.util.Cookie;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -10,7 +10,6 @@ import javafx.scene.image.Image;
 
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeMap;
 
 public class Account { // TODO: Make sure all this becomes thread safe at some point or another
     private final StringProperty name;

@@ -1,4 +1,4 @@
-package com.cldfire.xenforonotifier.util.notifications;
+package com.cldfire.forumnotifier.util.notifications;
 
 import java.awt.image.BufferedImage;
 

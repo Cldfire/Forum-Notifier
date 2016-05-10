@@ -1,6 +1,6 @@
-package com.cldfire.xenforonotifier.util;
+package com.cldfire.forumnotifier.util;
 
-import com.cldfire.xenforonotifier.XenForoNotifier;
+import com.cldfire.forumnotifier.ForumNotifier;
 
 import java.io.*;
 import java.util.Properties;
@@ -26,7 +26,7 @@ public class Settings { // TODO: Clean this up
     public static void load() {
         properties = new Properties();
         try {
-            File file = new File(XenForoNotifier.APP_DIR, "settings.properties");
+            File file = new File(ForumNotifier.APP_DIR, "settings.properties");
             if (file.exists()) {
                 properties.load(new FileInputStream(file));
             } else {
@@ -34,7 +34,7 @@ public class Settings { // TODO: Clean this up
                 InputStream inputStream = Settings.class.getResourceAsStream("/" + file.getName());
                 Properties tmpProperties = new Properties();
                 tmpProperties.load(inputStream);
-                FileOutputStream fileOutputStream = new FileOutputStream(new File(XenForoNotifier.APP_DIR, "settings.properties"));
+                FileOutputStream fileOutputStream = new FileOutputStream(new File(ForumNotifier.APP_DIR, "settings.properties"));
                 tmpProperties.store(fileOutputStream, "XenForo Notifier");
                 fileOutputStream.close();
                 load();
@@ -52,7 +52,7 @@ public class Settings { // TODO: Clean this up
 
     public static void save() { // TODO: Use this
         try {
-            FileOutputStream fileOutputStream = new FileOutputStream(new File(XenForoNotifier.APP_DIR, "settings.properties"));
+            FileOutputStream fileOutputStream = new FileOutputStream(new File(ForumNotifier.APP_DIR, "settings.properties"));
             properties.store(fileOutputStream, "XenForo Notifier");
             fileOutputStream.close();
         } catch (IOException e) {

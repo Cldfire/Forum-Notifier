@@ -1,11 +1,10 @@
-package com.cldfire.xenforonotifier.model;
+package com.cldfire.forumnotifier.model;
 
-import com.cldfire.xenforonotifier.util.EnumGoogleIcon;
+import com.cldfire.forumnotifier.util.EnumGoogleIcon;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
@@ -53,18 +52,18 @@ public class AccountDisplayBlock extends ListCell<Account> {
         forumUrl.setLayoutX(85);
 
         Text notificationIcon = new Text(EnumGoogleIcon.NOTIFICATIONS.get() + " ");
-        alertCount = new Text("5");
+        alertCount = new Text("0");
         Text messageIcon = new Text("  " + EnumGoogleIcon.MESSAGE.get() + " ");
-        messageCount = new Text("2");
+        messageCount = new Text("0");
 
         notificationIcon.setStyle("-fx-font-family: \'Material Icons\'; -fx-font-size: 16; -fx-fill: white;");
         alertCount.setStyle("-fx-font-family: \'Segoe UI\'; -fx-font-size: 16; -fx-fill: #00ffec;");
         messageIcon.setStyle("-fx-font-family: \'Material Icons\'; -fx-font-size: 16; -fx-fill: white;");
         messageCount.setStyle("-fx-font-family: \'Segoe UI\'; -fx-font-size: 16; -fx-fill: #00ffec;");
 
-        TextFlow textFlow = new TextFlow(notificationIcon, alertCount, messageIcon, messageCount);
-        textFlow.setLayoutY(65);
-        textFlow.setLayoutX(85);
+        newNotifications = new TextFlow(notificationIcon, alertCount, messageIcon, messageCount);
+        newNotifications.setLayoutY(65);
+        newNotifications.setLayoutX(85);
 
         accountPic = new ImageView();
         accountPic.setLayoutY(10);
@@ -76,7 +75,7 @@ public class AccountDisplayBlock extends ListCell<Account> {
         blockPane.getChildren().add(divider);
         blockPane.getChildren().add(accountName);
         blockPane.getChildren().add(forumUrl);
-        blockPane.getChildren().add(textFlow);
+        blockPane.getChildren().add(newNotifications);
         blockPane.getChildren().add(accountPic);
     }
 
@@ -96,7 +95,6 @@ public class AccountDisplayBlock extends ListCell<Account> {
                 a.getAlertProperty().addListener(new ChangeListener<String>() {
                     @Override
                     public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-
 
 
                     }

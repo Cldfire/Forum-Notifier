@@ -4,27 +4,42 @@ Keep tabs on all those forum sites / accounts. Sends you desktop notifications f
 
 Please note that this project is currrently in the early stages of development.
 
-##Forum Softwares:
+##Supported Software / Sites:
+General software types:
 - [XenForo](https://xenforo.com) (WIP)
 - [NamelessMC](https://namelessmc.com) (PLANNED)
 - [Enjin](http://www.enjin.com/) (PLANNED)
-- Other various popular forum systems. If you would like to suggest one, create an issue in the issue tracker.
+- [StackExchange](http://stackexchange.com) (PLANNED)
+- Other popular systems. If you would like to suggest one, create an issue in the issue tracker (or PR it yourself)
+
+We also intend to support some sites that aren't really considered "forums":
+- [Github](https://github.com) (PLANNED)
+- More to come (suggestions welcome)
+
+##Screenshot(s)
+(not final)
+
+![alt text](http://i.imgur.com/yGjTfEo.png "Stat View")
 
 ##Features
-- Notifies user for all notifications.
-- Displays post and rating count.
-- Supports all XenForo sites (configuration needed).
-- Allows multiple XenForo sites and accounts.
-- Much, much more coming.
+- Notifies user for all notifications
+- Displays statistics
+- Update / view account information from one place
+- News feed / alert feed for all (or specific) accounts
+- Easy to PR support for any site using software we've already built infrastructure for
+- Works with any number of forums and accounts
+- More coming
 
 ##Downloads & Support
 - [Changelog](changelog.md)
-- [Issue Tracker](https://github.com/Cldfire/XenForo-Notifier/issues)
+- [Issue Tracker](https://github.com/Cldfire/Forum-Notifier/issues)
 - [Support](http://irc.spi.gt/iris/?nick=&channels=spigotnotifier)
-- [Download](https://github.com/Cldfire/XenForo-Notifier/releases)
+- [Download](https://github.com/Cldfire/Forum-Notifier/releases) < beta isn't ready yet, currently no compiled downloads
 
 ##Contributions
-For a complete list of the XenForo Notifier contributors, please see [here](https://github.com/Cldfire/XenForo-Notifier/graphs/contributors).
+Contributions are greatly appreciated; if you'd like to help out, join [our IRC channel](http://irc.spi.gt/iris/?nick=&channels=spigotnotifier) for discussion.
+
+A guide on how to PR support for another site will be coming soon (tm).
 
 
 

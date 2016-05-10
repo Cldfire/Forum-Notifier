@@ -1,6 +1,6 @@
-package com.cldfire.xenforonotifier.util;
+package com.cldfire.forumnotifier.util;
 
-import com.cldfire.xenforonotifier.XenForoNotifier;
+import com.cldfire.forumnotifier.ForumNotifier;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -50,7 +50,7 @@ public class LangUtils { // TODO: Clean this up, rushed it to get repo online
         properties = new Properties();
 
         try {
-            File file = new File(XenForoNotifier.APP_DIR + "/lang", locale.getTag() + ".lang");
+            File file = new File(ForumNotifier.APP_DIR + "/lang", locale.getTag() + ".lang");
             if (file.exists()) {
                 properties.load(new FileInputStream(file));
             } else {

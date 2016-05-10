@@ -6,7 +6,7 @@
             minWidth="-Infinity"
             prefHeight="450.0" prefWidth="800.0" styleClass="background"
             stylesheets="@../stylesheets/insertnamehere.css" xmlns="http://javafx.com/javafx/8.0.65"
-            fx:controller="com.cldfire.xenforonotifier.view.LoginViewController">
+            fx:controller="com.cldfire.forumnotifier.view.LoginViewController">
     <children>
         <TextField fx:id="username" layoutX="300.0" layoutY="215.0" prefWidth="200.0" promptText="username"
                    visible="false"/>

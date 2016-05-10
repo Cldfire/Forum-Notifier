@@ -1,9 +1,9 @@
-package com.cldfire.xenforonotifier.view;
+package com.cldfire.forumnotifier.view;
 
-import com.cldfire.xenforonotifier.model.Account;
-import com.cldfire.xenforonotifier.model.AccountDisplayBlock;
-import com.cldfire.xenforonotifier.util.ForumsStore;
-import com.cldfire.xenforonotifier.util.notifications.Notification;
+import com.cldfire.forumnotifier.model.Account;
+import com.cldfire.forumnotifier.model.AccountDisplayBlock;
+import com.cldfire.forumnotifier.util.ForumsStore;
+import com.cldfire.forumnotifier.util.notifications.Notification;
 import com.gargoylesoftware.htmlunit.BrowserVersion;
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.html.HtmlDefinitionDescription;

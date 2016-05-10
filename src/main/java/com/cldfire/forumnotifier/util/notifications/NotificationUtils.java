@@ -1,6 +1,6 @@
-package com.cldfire.xenforonotifier.util.notifications;
+package com.cldfire.forumnotifier.util.notifications;
 
-import com.cldfire.xenforonotifier.XenForoNotifier;
+import com.cldfire.forumnotifier.ForumNotifier;
 import com.github.plushaze.traynotification.animations.Animations;
 import com.github.plushaze.traynotification.notification.TrayNotification;
 import javafx.embed.swing.SwingFXUtils;
@@ -181,7 +181,7 @@ class NotificationUtils {
      */
     private static String copyResourceToTemp(String inJarPath, String fileType) {
         try {
-            InputStream input = XenForoNotifier.class.getClassLoader().getResourceAsStream(inJarPath);
+            InputStream input = ForumNotifier.class.getClassLoader().getResourceAsStream(inJarPath);
             File file = File.createTempFile(new Date().getTime() + "", fileType);
             OutputStream out = new FileOutputStream(file);
             int read;

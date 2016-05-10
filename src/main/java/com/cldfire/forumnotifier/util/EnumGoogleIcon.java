@@ -1,4 +1,4 @@
-package com.cldfire.xenforonotifier.util;
+package com.cldfire.forumnotifier.util;
 
 /**
  * Created by Cldfire on 5/9/2016.

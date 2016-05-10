@@ -7,7 +7,7 @@
             minWidth="-Infinity"
             prefHeight="500.0" prefWidth="800.0" stylesheets="@../stylesheets/insertnamehere.css"
             xmlns="http://javafx.com/javafx/8.0.65"
-            fx:controller="com.cldfire.xenforonotifier.view.RootLayoutController">
+            fx:controller="com.cldfire.forumnotifier.view.RootLayoutController">
     <top>
         <AnchorPane prefHeight="50.0" prefWidth="200.0" styleClass="background"
                     stylesheets="@../stylesheets/insertnamehere.css" BorderPane.alignment="CENTER">

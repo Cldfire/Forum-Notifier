@@ -1,6 +1,6 @@
-package com.cldfire.xenforonotifier.view;
+package com.cldfire.forumnotifier.view;
 
-import com.cldfire.xenforonotifier.XenForoNotifier;
+import com.cldfire.forumnotifier.ForumNotifier;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 
@@ -8,19 +8,19 @@ public class RootLayoutController {
     @FXML
     Button addAccount;
 
-    private XenForoNotifier xenForoNotifier;
+    private ForumNotifier forumNotifier;
 
-    public void setXenForoNotifier(XenForoNotifier xenForoNotifier) {
-        this.xenForoNotifier = xenForoNotifier;
+    public void setForumNotifier(ForumNotifier forumNotifier) {
+        this.forumNotifier = forumNotifier;
     }
 
     @FXML
     private void handleAddAccount() {
         if (addAccount.getText().equalsIgnoreCase("add")) {
-            xenForoNotifier.showLoginView();
+            forumNotifier.showLoginView();
             addAccount.setText("Cancel");
         } else {
-            xenForoNotifier.showStatView();
+            forumNotifier.showStatView();
             addAccount.setText("Add");
         }
 

@@ -22,15 +22,14 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-package com.cldfire.xenforonotifier;
+package com.cldfire.forumnotifier;
 
-import com.cldfire.xenforonotifier.util.ForumsStore;
-import com.cldfire.xenforonotifier.util.LangUtils;
-import com.cldfire.xenforonotifier.util.LangUtils.Locale;
-import com.cldfire.xenforonotifier.util.Settings;
-import com.cldfire.xenforonotifier.util.animations.ParticleAnimation;
-import com.cldfire.xenforonotifier.view.LoginViewController;
-import com.cldfire.xenforonotifier.view.RootLayoutController;
+import com.cldfire.forumnotifier.util.ForumsStore;
+import com.cldfire.forumnotifier.util.LangUtils;
+import com.cldfire.forumnotifier.util.LangUtils.Locale;
+import com.cldfire.forumnotifier.util.Settings;
+import com.cldfire.forumnotifier.view.LoginViewController;
+import com.cldfire.forumnotifier.view.RootLayoutController;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
@@ -42,7 +41,7 @@ import javafx.stage.Stage;
 import java.io.File;
 import java.io.IOException;
 
-public class XenForoNotifier extends Application { // Project started April 1st, 2016
+public class ForumNotifier extends Application { // Project started April 1st, 2016
 
     public static File APP_DIR;
     private Stage primaryStage;
@@ -67,7 +66,7 @@ public class XenForoNotifier extends Application { // Project started April 1st,
             primaryStage.setScene(scene);
 
             RootLayoutController controller = loader.getController();
-            controller.setXenForoNotifier(this);
+            controller.setForumNotifier(this);
 
             primaryStage.show();
         } catch (Exception e) {
@@ -95,7 +94,7 @@ public class XenForoNotifier extends Application { // Project started April 1st,
             BorderPane.setMargin(loginView, new Insets(0, 0, 450, 0));
 
             LoginViewController controller = loader.getController();
-            controller.setXenForoNotifier(this);
+            controller.setForumNotifier(this);
             this.loginViewController = controller;
 
         } catch (IOException e) {
@@ -114,7 +113,7 @@ public class XenForoNotifier extends Application { // Project started April 1st,
 
     @Override
     public void start(Stage primaryStage) throws IOException {
-        APP_DIR = new File(System.getProperty("user.home"), ".xenforonotifier");
+        APP_DIR = new File(System.getProperty("user.home"), ".forumnotifier");
         if (!APP_DIR.exists()) { // Technically first install
             boolean result = APP_DIR.mkdir();
             if (!result) {

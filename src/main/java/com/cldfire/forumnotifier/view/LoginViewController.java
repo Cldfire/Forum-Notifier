@@ -1,12 +1,12 @@
-package com.cldfire.xenforonotifier.view;
+package com.cldfire.forumnotifier.view;
 
-import com.cldfire.xenforonotifier.XenForoNotifier;
-import com.cldfire.xenforonotifier.model.Account;
-import com.cldfire.xenforonotifier.model.Forum;
-import com.cldfire.xenforonotifier.util.ForumsStore;
-import com.cldfire.xenforonotifier.util.LangUtils;
-import com.cldfire.xenforonotifier.util.animations.EnumAnimationType;
-import com.cldfire.xenforonotifier.util.animations.NodeAnimationUtils;
+import com.cldfire.forumnotifier.ForumNotifier;
+import com.cldfire.forumnotifier.model.Account;
+import com.cldfire.forumnotifier.model.Forum;
+import com.cldfire.forumnotifier.util.ForumsStore;
+import com.cldfire.forumnotifier.util.LangUtils;
+import com.cldfire.forumnotifier.util.animations.EnumAnimationType;
+import com.cldfire.forumnotifier.util.animations.NodeAnimationUtils;
 import com.gargoylesoftware.htmlunit.BrowserVersion;
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.html.*;
@@ -43,7 +43,7 @@ public class LoginViewController {
     private Button confirmButton;
     @FXML
     private Label errorLabel;
-    private XenForoNotifier xenForoNotifier;
+    private ForumNotifier forumNotifier;
     private String temp2faUrl;
     private String tempConnProtocol;
     private boolean doesForumExist;
@@ -64,8 +64,8 @@ public class LoginViewController {
         NodeAnimationUtils.bindFromToAnimation(EnumAnimationType.COLOR_FADE, authCode, 0.7, new Color(0.3098039215686275, 0.3098039215686275, 0.3098039215686275, 1), new Color(0, 1, 0.9254901960784314, 1));
     }
 
-    public void setXenForoNotifier(final XenForoNotifier xenForoNotifier) {
-        this.xenForoNotifier = xenForoNotifier;
+    public void setForumNotifier(final ForumNotifier forumNotifier) {
+        this.forumNotifier = forumNotifier;
     }
 
     public void resetForNewLogin() {
@@ -118,7 +118,7 @@ public class LoginViewController {
         HtmlImage image;
 
         try {
-            imageFolder = new File(XenForoNotifier.APP_DIR, "account_images");
+            imageFolder = new File(ForumNotifier.APP_DIR, "account_images");
             imageFile = new File(imageFolder, this.url.getText() + "_" + username.getText());
 
             if (!imageFolder.exists()) {
@@ -219,6 +219,10 @@ public class LoginViewController {
         }
     }
 
+    //private Boolean doesAccountExist() {
+
+    //}
+
     @FXML
     private void handleValidate() {
         Runnable validateRunnable = () -> {
@@ -284,7 +288,7 @@ public class LoginViewController {
                             doesForumExist = true;
                             Platform.runLater(() -> {
                                 StatViewController.addAccountBlock(newAccount);
-                                xenForoNotifier.showStatView();
+                                forumNotifier.showStatView();
                                 resetForNewLogin();
                             });
                         }
@@ -299,7 +303,7 @@ public class LoginViewController {
 
                         Platform.runLater(() -> {
                             StatViewController.addAccountBlock(addAccount);
-                            xenForoNotifier.showStatView();
+                            forumNotifier.showStatView();
                             resetForNewLogin();
                         });
                     }
@@ -340,7 +344,7 @@ public class LoginViewController {
                         doesForumExist = true;
                         Platform.runLater(() -> {
                             StatViewController.addAccountBlock(newAccount);
-                            xenForoNotifier.showStatView();
+                            forumNotifier.showStatView();
                             resetForNewLogin();
                         });
                     }
@@ -355,7 +359,7 @@ public class LoginViewController {
 
                     Platform.runLater(() -> {
                         StatViewController.addAccountBlock(addAccount);
-                        xenForoNotifier.showStatView();
+                        forumNotifier.showStatView();
                         resetForNewLogin();
                     });
                 }

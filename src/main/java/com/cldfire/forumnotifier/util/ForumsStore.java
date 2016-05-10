@@ -1,15 +1,13 @@
-package com.cldfire.xenforonotifier.util;
+package com.cldfire.forumnotifier.util;
 
-import com.cldfire.xenforonotifier.XenForoNotifier;
-import com.cldfire.xenforonotifier.model.Account;
-import com.cldfire.xenforonotifier.model.Forum;
-import com.cldfire.xenforonotifier.view.LoginViewController;
+import com.cldfire.forumnotifier.ForumNotifier;
+import com.cldfire.forumnotifier.model.Account;
+import com.cldfire.forumnotifier.model.Forum;
 import com.gargoylesoftware.htmlunit.util.Cookie;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.internal.LinkedTreeMap;
 import com.google.gson.reflect.TypeToken;
-import org.apache.http.cookie.ClientCookie;
 
 import java.io.*;
 import java.text.ParseException;
@@ -21,7 +19,7 @@ public class ForumsStore { // TODO: Add things, idk what to add
 
     public static void loadForums() {
         Gson gson = new Gson();
-        File file = new File(XenForoNotifier.APP_DIR, "forums.json");
+        File file = new File(ForumNotifier.APP_DIR, "forums.json");
         if (!file.exists()) {
             try {
                 file.createNewFile();
@@ -83,7 +81,7 @@ public class ForumsStore { // TODO: Add things, idk what to add
             gsonBuilder.setPrettyPrinting().serializeNulls();
         }
         Gson gson = gsonBuilder.create();
-        File file = new File(XenForoNotifier.APP_DIR, "forums.json");
+        File file = new File(ForumNotifier.APP_DIR, "forums.json");
         try {
             FileWriter fileWriter = new FileWriter(file);
             Set<Map> saveForums = new HashSet<>();

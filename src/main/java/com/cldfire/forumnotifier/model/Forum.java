@@ -1,4 +1,4 @@
-package com.cldfire.xenforonotifier.model;
+package com.cldfire.forumnotifier.model;
 
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
