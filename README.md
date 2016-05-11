@@ -33,11 +33,11 @@ We also intend to support some sites that aren't really considered "forums":
 ##Downloads & Support
 - [Changelog](changelog.md)
 - [Issue Tracker](https://github.com/Cldfire/Forum-Notifier/issues)
-- [Support](http://irc.spi.gt/iris/?nick=&channels=spigotnotifier)
+- [Support](https://discord.gg/010FelNLz6033egNT)
 - [Download](https://github.com/Cldfire/Forum-Notifier/releases) < beta isn't ready yet, currently no compiled downloads
 
 ##Contributions
-Contributions are greatly appreciated; if you'd like to help out, join [our IRC channel](http://irc.spi.gt/iris/?nick=&channels=spigotnotifier) for discussion.
+Contributions are greatly appreciated; if you'd like to help out, join [our Discord server](https://discord.gg/010FelNLz605nQi3u) for discussion.
 
 A guide on how to PR support for another site will be coming soon (tm).
 
