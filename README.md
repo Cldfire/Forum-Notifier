@@ -10,6 +10,7 @@ General software types:
 - [NamelessMC](https://namelessmc.com) (PLANNED)
 - [Enjin](http://www.enjin.com/) (PLANNED)
 - [StackExchange](http://stackexchange.com) (PLANNED)
+- [Discourse](https://www.discourse.org/) (PLANNED)
 - Other popular systems. If you would like to suggest one, create an issue in the issue tracker (or PR it yourself)
 
 We also intend to support some sites that aren't really considered "forums":
