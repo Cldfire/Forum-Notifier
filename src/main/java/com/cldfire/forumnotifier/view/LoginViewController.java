@@ -57,11 +57,11 @@ public class LoginViewController {
     private String tempConnProtocol;
     private boolean doesForumExist;
 
-    Map<String, Map<String, Object>> defaultXpaths = new HashMap<>(new DefaultXpaths(Forum.ForumType.XENFORO, tempSiteUrl).get());
-    Map<String, Object> accountXpathsMap = new HashMap<>(defaultXpaths.get("accountXpathsMap"));
-    List<String> profileNamePaths = new ArrayList<>((List<String>) accountXpathsMap.get("accountNamePaths"));
-    List<String> profileUrlPaths = new ArrayList<>((List<String>) accountXpathsMap.get("accountUrlPaths"));
-    List<String> profilePicPaths = new ArrayList<>((List<String>) accountXpathsMap.get("accountPicPaths"));
+    private Map<String, Map<String, Object>> defaultXpaths = new HashMap<>(new DefaultXpaths(Forum.ForumType.XENFORO, tempSiteUrl).get());
+    private Map<String, Object> accountXpathsMap = new HashMap<>(defaultXpaths.get("accountXpathsMap"));
+    private List<String> profileNamePaths = new ArrayList<>((List<String>) accountXpathsMap.get("accountNamePaths"));
+    private List<String> profileUrlPaths = new ArrayList<>((List<String>) accountXpathsMap.get("accountUrlPaths"));
+    private List<String> profilePicPaths = new ArrayList<>((List<String>) accountXpathsMap.get("accountPicPaths"));
 
     public void initialize() {
         RootLayoutController.setLoginViewController(this);
