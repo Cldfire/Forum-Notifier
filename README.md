@@ -10,6 +10,7 @@ General software types:
 - [NamelessMC](https://namelessmc.com) (PLANNED)
 - [Enjin](http://www.enjin.com/) (PLANNED)
 - [StackExchange](http://stackexchange.com) (PLANNED)
+- [Discourse](https://www.discourse.org/) (PLANNED)
 - Other popular systems. If you would like to suggest one, create an issue in the issue tracker (or PR it yourself)
 
 We also intend to support some sites that aren't really considered "forums":
@@ -33,11 +34,11 @@ We also intend to support some sites that aren't really considered "forums":
 ##Downloads & Support
 - [Changelog](changelog.md)
 - [Issue Tracker](https://github.com/Cldfire/Forum-Notifier/issues)
-- [Support](http://irc.spi.gt/iris/?nick=&channels=spigotnotifier)
+- [Support](https://discord.gg/010FelNLz6033egNT)
 - [Download](https://github.com/Cldfire/Forum-Notifier/releases) < beta isn't ready yet, currently no compiled downloads
 
 ##Contributions
-Contributions are greatly appreciated; if you'd like to help out, join [our IRC channel](http://irc.spi.gt/iris/?nick=&channels=spigotnotifier) for discussion.
+Contributions are greatly appreciated; if you'd like to help out, join [our Discord server](https://discord.gg/010FelNLz605nQi3u) for discussion.
 
 A guide on how to PR support for another site will be coming soon (tm).
 
