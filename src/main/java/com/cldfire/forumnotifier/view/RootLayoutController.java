@@ -3,7 +3,6 @@ package com.cldfire.forumnotifier.view;
 import com.cldfire.forumnotifier.ForumNotifier;
 import com.cldfire.forumnotifier.util.EnumGoogleIcon;
 import com.cldfire.forumnotifier.util.LangUtils;
-import com.cldfire.forumnotifier.util.Settings;
 import javafx.fxml.FXML;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
@@ -15,12 +14,13 @@ public class RootLayoutController {
     private ForumNotifier forumNotifier;
     private static LoginViewController loginViewController;
 
-    Text addIcon;
-    Text addText;
+    private Text addIcon;
+    private Text addText;
     private boolean loggingIn = false;
 
     @FXML
     private void initialize() {
+        LoginViewController.setRootLayoutController(this);
         addIcon = new Text(EnumGoogleIcon.ADD_BOX.get());
         addIcon.setStyle("-fx-font-family: 'Material Icons'; -fx-font-size: 24; -fx-fill: #7c7c7c;");
         addText = new Text(LangUtils.translate("statview.addaccount.add"));
@@ -76,5 +76,14 @@ public class RootLayoutController {
     private void handleMouseExitAdd() {
         addIcon.setStyle("-fx-font-family: 'Material Icons'; -fx-font-size: 24; -fx-fill: #7c7c7c;");
         addText.setStyle("-fx-font-family: 'Segoe UI'; -fx-font-size: 16; -fx-fill: #7c7c7c;");
+    }
+
+    public void changeButtonToAdd() {
+        addIcon.setStyle("-fx-font-family: 'Material Icons'; -fx-font-size: 24; -fx-fill: white;");
+        addIcon.setText(EnumGoogleIcon.ADD_BOX.get());
+        addText.setText(LangUtils.translate("statview.addaccount.add"));
+        addIcon.setTranslateX(0);
+        addText.setTranslateX(1);
+        loggingIn = false;
     }
 }

@@ -22,7 +22,7 @@ public class Account { // TODO: Make sure all this becomes thread safe at some p
     private Set<Cookie> cookies;
     private String profileUrl;
     private String picFilePath;
-    private Map<String, Map<String, Object>> xpathMaps;
+    private Map<String, Object> xpathMaps;
 
     public Account(Map<String, Object> accountData) {
         this.name = new SimpleStringProperty((String) accountData.get("name"));
@@ -35,7 +35,7 @@ public class Account { // TODO: Make sure all this becomes thread safe at some p
         picFilePath = (String) accountData.get("picFilePath");
 
         try {
-            xpathMaps = new HashMap<>((Map<String, Map<String, Object>>) accountData.get("xpathMaps"));
+            xpathMaps = new HashMap<>((Map<String, Object>) accountData.get("xpathMaps"));
         } catch (NullPointerException e) {
             xpathMaps = new DefaultXpaths(Forum.ForumType.XENFORO, "www.spigotmc.org").get();
         }
@@ -120,11 +120,7 @@ public class Account { // TODO: Make sure all this becomes thread safe at some p
         this.picFilePath = picFilePath;
     }
 
-    public Map<String, Map<String, Object>> getXpathMaps() {
-        return xpathMaps;
-    }
-
     public Map<String, Object> getAccountXpathsMap() {
-        return xpathMaps.get("accountXpathsMap");
+        return xpathMaps;
     }
 }

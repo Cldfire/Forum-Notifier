@@ -52,16 +52,18 @@ public class LoginViewController {
     private Label errorLabel;
 
     private ForumNotifier forumNotifier;
+    private static RootLayoutController rootLayoutController;
+
     private String tempSiteUrl;
-    private String temp2faUrl;
     private String tempConnProtocol;
     private boolean doesForumExist;
+    private HtmlPage twoFactorPage;
 
-    private Map<String, Map<String, Object>> defaultXpaths = new HashMap<>(new DefaultXpaths(Forum.ForumType.XENFORO, tempSiteUrl).get());
-    private Map<String, Object> accountXpathsMap = new HashMap<>(defaultXpaths.get("accountXpathsMap"));
-    private List<String> profileNamePaths = new ArrayList<>((List<String>) accountXpathsMap.get("accountNamePaths"));
-    private List<String> profileUrlPaths = new ArrayList<>((List<String>) accountXpathsMap.get("accountUrlPaths"));
-    private List<String> profilePicPaths = new ArrayList<>((List<String>) accountXpathsMap.get("accountPicPaths"));
+    private Map<String, Object> defaultXpaths = new HashMap<>(new DefaultXpaths(Forum.ForumType.XENFORO, tempSiteUrl).get());
+    private List<String> twoFactorLoginFormPaths = new ArrayList<>((List<String>) defaultXpaths.get("twoFactorLoginFormPaths"));
+    private List<String> profileNamePaths = new ArrayList<>((List<String>) defaultXpaths.get("accountNamePaths"));
+    private List<String> profileUrlPaths = new ArrayList<>((List<String>) defaultXpaths.get("accountUrlPaths"));
+    private List<String> profilePicPaths = new ArrayList<>((List<String>) defaultXpaths.get("accountPicPaths"));
 
     public void initialize() {
         RootLayoutController.setLoginViewController(this);
@@ -84,6 +86,10 @@ public class LoginViewController {
         this.forumNotifier = forumNotifier;
     }
 
+    public static void setRootLayoutController(RootLayoutController rootLayoutController1) {
+        rootLayoutController = rootLayoutController1;
+    }
+
     public void resetForNewLogin() {
         validateButton.setVisible(true);
         username.setVisible(false);
@@ -98,8 +104,9 @@ public class LoginViewController {
         password.setText("");
         authCode.setText("");
 
-        temp2faUrl = "";
-        tempConnProtocol = "";
+        tempSiteUrl = null;
+        tempConnProtocol = null;
+        twoFactorPage = null;
         doesForumExist = false;
 
         webClient.getCache().clear();
@@ -139,6 +146,21 @@ public class LoginViewController {
             e.printStackTrace();
             return null;
         }
+    }
+
+    private HtmlForm checkXpathListForForm(final List<String> xpaths, final HtmlPage page) {
+        for (String x : xpaths) {
+            Object htmlElement = page.getFirstByXPath(x);
+
+            if (htmlElement != null) {
+                switch (htmlElement.getClass().getTypeName()) {
+                    case "com.gargoylesoftware.htmlunit.html.HtmlForm": {
+                        return (HtmlForm) htmlElement;
+                    }
+                }
+            }
+        }
+        return null;
     }
 
     public static String checkXpathListForString(final List<String> xpaths, final HtmlPage page) {
@@ -284,37 +306,36 @@ public class LoginViewController {
         }
     }
 
-    private HtmlPage loginTwoFactorAuth(final String url, final String code) {
-
+    private void loginTwoFactorAuth(final String code, final HtmlPage page) {
         final HtmlForm authForm;
         final HtmlSubmitInput confirmButton;
         final HtmlCheckBoxInput trustDevice;
         final HtmlTextInput codeField;
-        HtmlPage page;
 
         try {
-            page = webClient.getPage(url);
-            authForm = page.getFirstByXPath("/html/body//form[@action='login/two-step']");
-            confirmButton = authForm.getInputByName("save");
-            codeField = authForm.getInputByName("code");
-            trustDevice = authForm.getInputByName("trust");
+            authForm = checkXpathListForForm(twoFactorLoginFormPaths, page);
 
-            codeField.setValueAttribute(code);
-            trustDevice.setChecked(true);
+            if (authForm != null) { // TODO: Tell user that form couldn't be found, prompt them to enter correct xpath
+                confirmButton = authForm.getInputByName("save");
+                codeField = authForm.getInputByName("code");
+                trustDevice = authForm.getInputByName("trust");
 
-            return confirmButton.click();
+                codeField.setValueAttribute(code);
+                trustDevice.setChecked(true);
+
+                confirmButton.click();
+            }
         } catch (Exception e) {
             e.printStackTrace();
-            return null;
         }
     }
 
-    private Boolean validateSite(final String url) {
+    private Boolean validateSite(final String url) { // TODO: Have this throwExceptionOnFailingStatusCode and then check for cloudflare if it's a 503, rather than ignoring all other status codes
         webClient.getOptions().setCssEnabled(false);
         webClient.getOptions().setJavaScriptEnabled(false);
         webClient.getOptions().setThrowExceptionOnFailingStatusCode(false);
 
-        HtmlPage page;
+        final HtmlPage page;
         final HtmlHtml forumType;
 
         try {
@@ -322,7 +343,7 @@ public class LoginViewController {
 
             if (testForCloudflare(page)) { // TODO: Tell user that Cloudflare is causing the delay
                 webClient.getCookieManager().addCookie(completeCloudflareBrowserCheck(url));
-                page = webClient.getPage(url);
+                validateSite(url);
             }
 
             forumType = page.getFirstByXPath("/html[@id='XenForo']");
@@ -334,13 +355,16 @@ public class LoginViewController {
         }
     }
 
-    //private Boolean doesAccountExist() { // TODO: < ----
+    //private boolean doesAccountExist() { // TODO: < ----
 
     //}
 
     @FXML
     private void handleValidate() {
-        if (url.getText() != "Forum URL") {
+        if (url.getText().trim().isEmpty()) {
+            errorLabel.setText(LangUtils.translate("login.errorLabel.null"));
+            errorLabel.setVisible(true);
+        } else {
             Runnable validateRunnable = () -> {
                 errorLabel.setVisible(false);
                 try {
@@ -374,25 +398,22 @@ public class LoginViewController {
                 }
             };
             executor.submit(validateRunnable);
-        } else {
-            errorLabel.setText(LangUtils.translate("login.errorLabel.null"));
-            errorLabel.setVisible(true);
         }
     }
 
     @FXML
     private void handleLogin() { // TODO: Finalize error handling here, clean up where necessary
-        if (username.getText() == "" || password.getText() == "") {
+        if (username.getText().trim().isEmpty() || password.getText().trim().isEmpty()) {
             errorLabel.setText(LangUtils.translate("login.errorLabel.null"));
             errorLabel.setVisible(true);
         } else {
             Runnable loginRunnable = () -> {
                 Platform.runLater(() -> errorLabel.setVisible(false));
-                HtmlPage postLoginPage = loginToSite(tempSiteUrl + "/login", username.getText(), password.getText());
+                final HtmlPage postLoginPage = loginToSite(tempSiteUrl + "/login", username.getText(), password.getText());
 
                 if (postLoginPage != null) {
                     if (postLoginPage.getUrl().toString().startsWith(tempSiteUrl + "/login/two-step")) {
-                        temp2faUrl = postLoginPage.getUrl().toString();
+                        twoFactorPage = postLoginPage;
                         password.setVisible(false);
                         username.setVisible(false);
                         loginButton.setVisible(false);
@@ -418,6 +439,7 @@ public class LoginViewController {
                                     Platform.runLater(() -> {
                                         StatViewController.addAccountBlock(addAccount);
                                         forumNotifier.showStatView();
+                                        rootLayoutController.changeButtonToAdd();
                                         resetForNewLogin();
                                     });
                                 }
@@ -425,11 +447,8 @@ public class LoginViewController {
                         }
 
                         if (!doesForumExist) {
-                            System.out.println("creating forum");
                             Forum addForum = ForumsStore.createForum(url.getText(), Forum.ForumType.XENFORO, tempConnProtocol);
-                            System.out.println("Created forum");
                             Account addAccount = ForumsStore.createAccount(webClient.getCookieManager().getCookies(), getAccountName(tempSiteUrl, profileNamePaths), getProfileUrl(tempSiteUrl, profileUrlPaths), getAccountPic(getProfileUrl(tempSiteUrl, profileUrlPaths), profilePicPaths), defaultXpaths);
-                            System.out.println("Created account");
 
                             addForum.addAccount(addAccount);
                             ForumsStore.addForum(addForum);
@@ -437,6 +456,7 @@ public class LoginViewController {
                             Platform.runLater(() -> {
                                 StatViewController.addAccountBlock(addAccount);
                                 forumNotifier.showStatView();
+                                rootLayoutController.changeButtonToAdd();
                                 resetForNewLogin();
                             });
                         }
@@ -461,13 +481,13 @@ public class LoginViewController {
 
     @FXML
     private void handleTwoFactorAuthLogin() { // TODO: Get this to support 2FA via emailed code or whatever that method is
-        if (authCode.getText() == "") {
+        if (authCode.getText().trim().isEmpty()) {
             errorLabel.setText(LangUtils.translate("login.errorLabel.null"));
             errorLabel.setVisible(true);
         } else {
             Runnable twoFactorRunnable = () -> {
                 Platform.runLater(() -> errorLabel.setVisible(false));
-                loginTwoFactorAuth(temp2faUrl, authCode.getText());
+                loginTwoFactorAuth(authCode.getText(), twoFactorPage);
 
                 if (testForLoggedIn()) {
                     System.out.println("We are logged in");
@@ -487,6 +507,7 @@ public class LoginViewController {
                                 Platform.runLater(() -> {
                                     StatViewController.addAccountBlock(addAccount);
                                     forumNotifier.showStatView();
+                                    rootLayoutController.changeButtonToAdd();
                                     resetForNewLogin();
                                 });
                             }
@@ -494,11 +515,8 @@ public class LoginViewController {
                     }
 
                     if (!doesForumExist) {
-                        System.out.println("creating forum");
                         Forum addForum = ForumsStore.createForum(url.getText(), Forum.ForumType.XENFORO, tempConnProtocol);
-                        System.out.println("Created forum");
                         Account addAccount = ForumsStore.createAccount(webClient.getCookieManager().getCookies(), getAccountName(tempSiteUrl, profileNamePaths), getProfileUrl(tempSiteUrl, profileUrlPaths), getAccountPic(getProfileUrl(tempSiteUrl, profileUrlPaths), profilePicPaths), defaultXpaths);
-                        System.out.println("Created account");
 
                         addForum.addAccount(addAccount);
                         ForumsStore.addForum(addForum);
@@ -506,6 +524,7 @@ public class LoginViewController {
                         Platform.runLater(() -> {
                             StatViewController.addAccountBlock(addAccount);
                             forumNotifier.showStatView();
+                            rootLayoutController.changeButtonToAdd();
                             resetForNewLogin();
                         });
                     }

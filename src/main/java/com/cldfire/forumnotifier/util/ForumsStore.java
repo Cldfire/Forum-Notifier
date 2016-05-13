@@ -68,7 +68,7 @@ public class ForumsStore { // TODO: Add things, idk what to add
                             }
                         });
 
-                        addForum.addAccount(createAccount(cookies, (String) ad.get("name"), (String) ad.get("profileUrl"), (String) ad.get("picFilePath"), (Map<String, Map<String, Object>>) ad.get("xpathMaps")));
+                        addForum.addAccount(createAccount(cookies, (String) ad.get("name"), (String) ad.get("profileUrl"), (String) ad.get("picFilePath"), (Map<String, Object>) ad.get("xpathMaps")));
                     });
                     forums.add(addForum);
                 });
@@ -122,7 +122,7 @@ public class ForumsStore { // TODO: Add things, idk what to add
         return new Forum(returnForumData);
     }
 
-    public static Account createAccount(Set<Cookie> cookies, String name, String profileUrl, String picFilePath, Map<String, Map<String, Object>> xpathMaps) {
+    public static Account createAccount(Set<Cookie> cookies, String name, String profileUrl, String picFilePath, Map<String, Object> xpathMaps) {
         Map<String, Object> returnAccountData = new HashMap<>();
 
         returnAccountData.put("cookies", cookies);

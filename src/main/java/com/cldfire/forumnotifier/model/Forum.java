@@ -75,7 +75,7 @@ public class Forum {
             ad.put("cookies", cd);
             ad.put("profileUrl", a.getProfileUrl());
             ad.put("picFilePath", a.getPicFilePath());
-            ad.put("xpathMaps", a.getXpathMaps());
+            ad.put("xpathMaps", a.getAccountXpathsMap());
 
             accountData.add(ad);
         });
