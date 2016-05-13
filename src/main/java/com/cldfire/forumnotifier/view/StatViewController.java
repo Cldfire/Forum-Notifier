@@ -6,20 +6,21 @@ import com.cldfire.forumnotifier.util.ForumsStore;
 import com.cldfire.forumnotifier.util.notifications.Notification;
 import com.gargoylesoftware.htmlunit.BrowserVersion;
 import com.gargoylesoftware.htmlunit.WebClient;
-import com.gargoylesoftware.htmlunit.html.HtmlDefinitionDescription;
 import com.gargoylesoftware.htmlunit.html.HtmlInput;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
-import com.gargoylesoftware.htmlunit.html.HtmlSpan;
+import com.gargoylesoftware.htmlunit.util.Cookie;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.ListView;
+import javafx.scene.layout.AnchorPane;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -31,6 +32,9 @@ public class StatViewController {
     private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
     @FXML
     private ListView<Account> accountOverview;
+    @FXML
+    private AnchorPane detailedView;
+
     // TODO start: This is temp right? Eventually these will be entirely dynamic
     private BufferedImage notifImage = getTempNotifImage();
 
@@ -44,7 +48,7 @@ public class StatViewController {
     }
     // TODO end
 
-    public static void addAccountBlock(Account account) {
+    public static void addAccountBlock(final Account account) {
         accountBlocks.add(account);
         System.out.println(accountBlocks.size());
         System.out.println(accountBlocks);
@@ -60,7 +64,7 @@ public class StatViewController {
         checkEverythingAtFixedRate();
     }
 
-    private String getXenToken(Account account) {
+    private String getXenToken(final Account account) { // TODO: Re-write this if it ever gets used
         final WebClient webClient = new WebClient(BrowserVersion.CHROME);
         webClient.getOptions().setCssEnabled(false);
         webClient.getOptions().setJavaScriptEnabled(false);
@@ -83,16 +87,13 @@ public class StatViewController {
         return null;
     }
 
-    private Map<String, String> getEverything(Account a) {
+    private Map<String, String> getEverything(final Account a) {
         final WebClient webClient = new WebClient(BrowserVersion.CHROME);
         webClient.getOptions().setCssEnabled(false);
         webClient.getOptions().setJavaScriptEnabled(false);
+        webClient.getOptions().setThrowExceptionOnFailingStatusCode(false);
 
-        final HtmlPage page;
-        final HtmlSpan messages;
-        final HtmlSpan alerts;
-        final HtmlSpan ratings;
-        final HtmlDefinitionDescription posts;
+        HtmlPage page;
         Map<String, String> values = new HashMap<>();
 
         // feed the WebClient so that it does what we want it to
@@ -100,17 +101,26 @@ public class StatViewController {
         a.getCookies().forEach(c -> webClient.getCookieManager().addCookie(c));
 
         try {
-            page = webClient.getPage(a.getForum().getProtocol() + "://" + a.getForum().getUrl());
-            webClient.close();
-            messages = page.getFirstByXPath("//*[@id='uix_ConversationsMenu_Counter']/span");
-            alerts = page.getFirstByXPath("//*[@id='uix_AlertsMenu_Counter']/span");
-            ratings = page.getFirstByXPath("//*[@id='XenForo']/body/div[1]/aside[2]/div/div/div[1]/div[1]/div/div/div/dl/dd/span");
-            posts = page.getFirstByXPath("//*[@id='XenForo']/body/div[1]/aside[2]/div/div/div[1]/div[1]/div/div/div/div/dl/dd");
+            Map<String, Object> xpaths = new HashMap<>(a.getAccountXpathsMap());
+            String url = a.getProfileUrl(); // TODO: Don't use one URL
 
-            values.put("messages", messages.asText()); // TODO: Do something if this throws a NPE
-            values.put("alerts", alerts.asText());
-            values.put("ratings", ratings.asText());
-            values.put("posts", posts.asText());
+            page = webClient.getPage(url);
+
+            if (LoginViewController.testForCloudflare(page)) { // TODO: Tell user that Cloudflare is causing the delay
+                Cookie cookie = LoginViewController.completeCloudflareBrowserCheck(url);
+                webClient.getCookieManager().addCookie(cookie);
+                a.addCookie(cookie);
+                System.out.println(a.getCookies());
+                page = webClient.getPage(url);
+            }
+
+
+            webClient.close();
+
+            values.put("messages", LoginViewController.checkXpathListForString((List<String>) xpaths.get("messagePaths"), page));
+            values.put("alerts", LoginViewController.checkXpathListForString((List<String>) xpaths.get("alertPaths"), page));
+            values.put("ratings", LoginViewController.checkXpathListForString((List<String>) xpaths.get("ratingPaths"), page));
+            values.put("posts", LoginViewController.checkXpathListForString((List<String>) xpaths.get("postPaths"), page));
 
             return values;
         } catch (Exception e) {
@@ -118,10 +128,7 @@ public class StatViewController {
 
         }
         webClient.close();
-        values.put("messages", "N/A");
-        values.put("alerts", "N/A");
-        values.put("ratings", "N/A");
-        values.put("posts", "N/A");
+        values.put("N/A", "N/A");
         return values;
     }
 
@@ -134,29 +141,41 @@ public class StatViewController {
                 f.getAccounts().forEach(a -> {
                     System.out.println("There were accounts for that site");
                     System.out.println(a.getName());
-                    final Map<String, String> returnedValues = new HashMap<>(getEverything(a));
-                    final int newMessagesCount = Integer.parseInt(returnedValues.get("messages"));
-                    final int newAlertsCount = Integer.parseInt(returnedValues.get("alerts"));
+                    try {
+                        final Map<String, String> returnedValues = new HashMap<>(getEverything(a));
 
-                    if (newMessagesCount > a.getMessageCount()) { // TODO: Get notifications to work when both a message and alert notification needs to be created
-                        if (newMessagesCount - a.getMessageCount() == 1) {
-                            new Notification("XenForo Notifier", "You have a new message", notifImage).send();
-                        } else {
-                            new Notification("XenForo Notifier", "You have " + (newMessagesCount - a.getMessageCount()) + " new messages", notifImage).send();
-                        }
-                    }
+                        try {
+                            final Integer newMessagesCount = Integer.parseInt(returnedValues.get("messages"));
+                            final Integer newAlertsCount = Integer.parseInt(returnedValues.get("alerts"));
 
-                    if (newAlertsCount > a.getAlertCount()) {
-                        if (newAlertsCount - a.getAlertCount() == 1) {
-                            new Notification("XenForo Notifier", "You have a new alert", notifImage).send();
-                        } else {
-                            new Notification("XenForo Notifier", "You have " + (newAlertsCount - a.getAlertCount()) + " new alerts", notifImage).send();
+                            if (newMessagesCount > a.getMessageCount()) { // TODO: Get notifications to work when both a message and alert notification needs to be created
+                                if (newMessagesCount - a.getMessageCount() == 1) {
+                                    new Notification(a.getName() + "@" + a.getForum().getUrl(), "You have a new message", notifImage).send();
+                                } else {
+                                    new Notification(a.getName() + "@" + a.getForum().getUrl(), "You have " + (newMessagesCount - a.getMessageCount()) + " new messages", notifImage).send();
+                                }
+                            }
+
+                            if (newAlertsCount > a.getAlertCount()) {
+                                if (newAlertsCount - a.getAlertCount() == 1) {
+                                    new Notification(a.getName() + "@" + a.getForum().getUrl(), "You have a new alert", notifImage).send();
+                                } else {
+                                    new Notification(a.getName() + "@" + a.getForum().getUrl(), "You have " + (newAlertsCount - a.getAlertCount()) + " new alerts", notifImage).send();
+                                }
+                            }
+                            Platform.runLater(() -> {
+                                a.setMessageCount(newMessagesCount.toString());
+                                a.setAlertCount(newAlertsCount.toString());
+                            });
+                        } catch (NumberFormatException e) {
+                            Platform.runLater(() -> {
+                                a.setMessageCount("N/A");
+                                a.setAlertCount("N/A");
+                            });
                         }
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
-                    Platform.runLater(() -> {
-                        a.setMessageCount(newMessagesCount);
-                        a.setAlertCount(newAlertsCount);
-                    });
                 });
             });
             System.out.println("Ran checker");

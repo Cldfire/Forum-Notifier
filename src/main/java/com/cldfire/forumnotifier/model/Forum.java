@@ -5,7 +5,10 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class Forum {
     private final StringProperty url;
@@ -17,6 +20,29 @@ public class Forum {
         this.url = new SimpleStringProperty((String) forumData.get("url"));
         this.type = new SimpleObjectProperty<>((ForumType) forumData.get("type"));
         this.protocol = (String) forumData.get("protocol");
+    }
+
+    public enum ForumType {
+        XENFORO("XenForo");
+
+        private final String name;
+
+        ForumType(String name) {
+            this.name = name;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public ForumType fromName(String name) {
+            for (ForumType forumType : values()) {
+                if (name.equalsIgnoreCase(forumType.getName())) {
+                    return forumType;
+                }
+            }
+            return null;
+        }
     }
 
     public Map<String, Object> getForumData() {
@@ -39,13 +65,17 @@ public class Forum {
                 cda.put("domain", c.getDomain());
                 cda.put("expires", c.getExpires());
                 cda.put("path", c.getPath());
+                cda.put("isSecure", c.isSecure());
+                cda.put("isHttpOnly", c.isHttpOnly());
 
                 cd.add(cda);
             });
 
             ad.put("name", a.getName());
             ad.put("cookies", cd);
+            ad.put("profileUrl", a.getProfileUrl());
             ad.put("picFilePath", a.getPicFilePath());
+            ad.put("xpathMaps", a.getXpathMaps());
 
             accountData.add(ad);
         });
@@ -89,29 +119,6 @@ public class Forum {
 
     public void removeAccount(Account account) {
         accounts.remove(account);
-    }
-
-    public enum ForumType {
-        XENFORO("XenForo");
-
-        private final String name;
-
-        ForumType(String name) {
-            this.name = name;
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public ForumType fromName(String name) {
-            for (ForumType forumType : values()) {
-                if (name.equalsIgnoreCase(forumType.getName())) {
-                    return forumType;
-                }
-            }
-            return null;
-        }
     }
 
 }

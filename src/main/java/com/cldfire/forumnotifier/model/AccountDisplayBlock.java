@@ -96,27 +96,37 @@ public class AccountDisplayBlock extends ListCell<Account> {
                 a.getAlertProperty().addListener(new ChangeListener<String>() {
                     @Override
                     public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-                        if (Integer.parseInt(newValue) > 0) {
+                        try {
+                            if (Integer.parseInt(newValue) > 0) {
+                                alertCount.setText(newValue);
+                                alertCount.setStyle("-fx-font-family: 'Segoe UI'; -fx-font-size: 16; -fx-fill: #00ffec;");
+                            } else {
+                                alertCount.setText(newValue);
+                                alertCount.setStyle("-fx-font-family: 'Segoe UI'; -fx-font-size: 16; -fx-fill: #7c7c7c;");
+                            }
+                        } catch (NumberFormatException e) {
                             alertCount.setText(newValue);
-                            alertCount.setStyle("-fx-font-family: 'Segoe UI'; -fx-font-size: 16; -fx-fill: #00ffec;");
-                        } else {
-                            alertCount.setText(newValue);
-                            alertCount.setStyle("-fx-font-family: 'Segoe UI'; -fx-font-size: 16; -fx-fill: #7c7c7c;");
+                            alertCount.setStyle("-fx-font-family: 'Segoe UI'; -fx-font-size: 16; -fx-fill: #ff5757;");
                         }
-
                     }
                 });
 
                 a.getMessageProperty().addListener(new ChangeListener<String>() {
                     @Override
                     public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-                        if (Integer.parseInt(newValue) > 0) {
+                        try {
+                            if (Integer.parseInt(newValue) > 0) {
+                                messageCount.setText(newValue);
+                                messageCount.setStyle("-fx-font-family: 'Segoe UI'; -fx-font-size: 16; -fx-fill: #00ffec;");
+                            } else {
+                                messageCount.setText(newValue);
+                                messageCount.setStyle("-fx-font-family: 'Segoe UI'; -fx-font-size: 16; -fx-fill: #7c7c7c;");
+                            }
+                        } catch (NumberFormatException e) {
                             messageCount.setText(newValue);
-                            messageCount.setStyle("-fx-font-family: 'Segoe UI'; -fx-font-size: 16; -fx-fill: #00ffec;");
-                        } else {
-                            messageCount.setText(newValue);
-                            messageCount.setStyle("-fx-font-family: 'Segoe UI'; -fx-font-size: 16; -fx-fill: #7c7c7c;");
+                            messageCount.setStyle("-fx-font-family: 'Segoe UI'; -fx-font-size: 16; -fx-fill: #ff5757;");
                         }
+
                     }
                 });
                 areListenersSet = true;

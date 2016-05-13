@@ -47,9 +47,9 @@ public class ForumsStore { // TODO: Add things, idk what to add
                     Forum addForum = createForum((String) f.get("url"), Forum.ForumType.XENFORO, (String) f.get("protocol"));
                     List<Map<String, Object>> accountData = new ArrayList<>((List<Map<String, Object>>) f.get("accounts"));
 
-                    accountData.forEach(a -> {
+                    accountData.forEach(ad -> {
                         Set<Cookie> cookies = new HashSet<>();
-                        List<LinkedTreeMap<String, Object>> cookieDataMap = new ArrayList<>((List<LinkedTreeMap<String, Object>>) a.get("cookies"));
+                        List<LinkedTreeMap<String, Object>> cookieDataMap = new ArrayList<>((List<LinkedTreeMap<String, Object>>) ad.get("cookies"));
 
                         cookieDataMap.forEach(c -> {
                             SimpleDateFormat formatter = new SimpleDateFormat("MMM dd, yyyy HH:mm:ss a");
@@ -59,15 +59,16 @@ public class ForumsStore { // TODO: Add things, idk what to add
                                 Date expires;
                                 if (expiresText != null) {
                                     expires = formatter.parse(expiresText);
-                                    cookies.add(new Cookie((String) c.get("domain"), (String) c.get("name"), (String) c.get("value"), (String) c.get("path"), expires, true));
+                                    cookies.add(new Cookie((String) c.get("domain"), (String) c.get("name"), (String) c.get("value"), (String) c.get("path"), expires, (boolean) c.get("isSecure"), (boolean) c.get("isHttpOnly")));
                                 } else {
-                                    cookies.add(new Cookie((String) c.get("domain"), (String) c.get("name"), (String) c.get("value"), (String) c.get("path"), null, true));
+                                    cookies.add(new Cookie((String) c.get("domain"), (String) c.get("name"), (String) c.get("value"), (String) c.get("path"), null, (boolean) c.get("isSecure"), (boolean) c.get("isHttpOnly")));
                                 }
                             } catch (ParseException e) {
                                 e.printStackTrace();
                             }
                         });
-                        addForum.addAccount(createAccount(cookies, (String) a.get("name"), (String) a.get("picFilePath")));
+
+                        addForum.addAccount(createAccount(cookies, (String) ad.get("name"), (String) ad.get("profileUrl"), (String) ad.get("picFilePath"), (Map<String, Map<String, Object>>) ad.get("xpathMaps")));
                     });
                     forums.add(addForum);
                 });
@@ -121,12 +122,14 @@ public class ForumsStore { // TODO: Add things, idk what to add
         return new Forum(returnForumData);
     }
 
-    public static Account createAccount(Set<Cookie> cookies, String name, String picFilePath) {
+    public static Account createAccount(Set<Cookie> cookies, String name, String profileUrl, String picFilePath, Map<String, Map<String, Object>> xpathMaps) {
         Map<String, Object> returnAccountData = new HashMap<>();
 
         returnAccountData.put("cookies", cookies);
         returnAccountData.put("name", name);
+        returnAccountData.put("profileUrl", profileUrl);
         returnAccountData.put("picFilePath", picFilePath);
+        returnAccountData.put("xpathMaps", xpathMaps);
 
         return new Account(returnAccountData);
     }
