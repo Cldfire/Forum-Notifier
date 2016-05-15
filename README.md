@@ -15,7 +15,7 @@ General software types:
 
 We also intend to support some sites that aren't really considered "forums":
 - [Github](https://github.com) (PLANNED)
-- [Apple Discussions](https://discussions.apple.com/welcome)
+- [Apple Discussions](https://discussions.apple.com/welcome) (PLANNED)
 - More to come (suggestions welcome)
 
 ##Screenshot(s)
