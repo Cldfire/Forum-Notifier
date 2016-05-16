@@ -71,6 +71,10 @@
     -fx-text-fill: #d8d8d8;
 }
 
+.button:pressed {
+    -fx-border-width: 0.5;
+}
+
 .list-cell {
     -fx-background: transparent;
 }
