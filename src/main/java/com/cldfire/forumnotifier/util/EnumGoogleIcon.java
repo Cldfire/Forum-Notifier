@@ -1,11 +1,8 @@
 package com.cldfire.forumnotifier.util;
 
-/**
- * Created by Cldfire on 5/9/2016.
- */
 public enum EnumGoogleIcon {
 
-    NOTIFICATIONS("\uE7F4"), MESSAGE("\uE0C9"), ADD("\uE145"), ADD_BOX("\uE146"), BACKSPACE("\uE14A");
+    NOTIFICATIONS("\uE7F4"), MESSAGE("\uE554"), ADD("\uE145"), ADD_BOX("\uE146"), BACKSPACE("\uE14A"), POST("\uE0C9"), STAR_BORDER("\uE83A");
 
     private final String unicode;
 

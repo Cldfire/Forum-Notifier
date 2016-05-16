@@ -1,8 +1,9 @@
 package com.cldfire.forumnotifier.view;
 
 import com.cldfire.forumnotifier.model.Account;
-import com.cldfire.forumnotifier.model.AccountDisplayBlock;
+import com.cldfire.forumnotifier.model.AccountDisplay;
 import com.cldfire.forumnotifier.util.ForumsStore;
+import com.cldfire.forumnotifier.util.XpathUtils;
 import com.cldfire.forumnotifier.util.notifications.Notification;
 import com.gargoylesoftware.htmlunit.BrowserVersion;
 import com.gargoylesoftware.htmlunit.WebClient;
@@ -30,6 +31,8 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 public class StatViewController {
     private static ObservableList<Account> accountBlocks; // TODO: make sure this is thread-safe
     private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
+    private XpathUtils xpathUtils;
+
     @FXML
     private ListView<Account> accountOverview;
     @FXML
@@ -56,10 +59,11 @@ public class StatViewController {
 
     @FXML
     private void initialize() {
+        xpathUtils = new XpathUtils();
         accountBlocks = FXCollections.observableArrayList();
         ForumsStore.forums.forEach(f -> f.getAccounts().forEach(a -> accountBlocks.add(a)));
 
-        accountOverview.setCellFactory((ListView<Account> l) -> new AccountDisplayBlock());
+        accountOverview.setCellFactory((ListView<Account> l) -> new AccountDisplay());
         accountOverview.setItems(accountBlocks);
         checkEverythingAtFixedRate();
     }
@@ -117,10 +121,10 @@ public class StatViewController {
 
             webClient.close();
 
-            values.put("messages", LoginViewController.checkXpathListForString((List<String>) xpaths.get("messagePaths"), page));
-            values.put("alerts", LoginViewController.checkXpathListForString((List<String>) xpaths.get("alertPaths"), page));
-            values.put("ratings", LoginViewController.checkXpathListForString((List<String>) xpaths.get("ratingPaths"), page));
-            values.put("posts", LoginViewController.checkXpathListForString((List<String>) xpaths.get("postPaths"), page));
+            values.put("messages", xpathUtils.checkXpathListForString((List<String>) xpaths.get("messagePaths"), page));
+            values.put("alerts", xpathUtils.checkXpathListForString((List<String>) xpaths.get("alertPaths"), page));
+            values.put("posts", xpathUtils.checkXpathListForString((List<String>) xpaths.get("postPaths"), page));
+            values.put("ratings", xpathUtils.checkXpathListForString((List<String>) xpaths.get("ratingPaths"), page));
 
             return values;
         } catch (Exception e) {
@@ -142,32 +146,57 @@ public class StatViewController {
                     System.out.println("There were accounts for that site");
                     System.out.println(a.getName());
                     try {
+                        System.out.println("Handling " + a.getName() + " @ " + a.getForum().getUrl());
                         final Map<String, String> returnedValues = new HashMap<>(getEverything(a));
 
                         try {
                             final Integer newMessagesCount = Integer.parseInt(returnedValues.get("messages"));
                             final Integer newAlertsCount = Integer.parseInt(returnedValues.get("alerts"));
+                            final Integer postCount = Integer.parseInt(returnedValues.get("posts").replace(",", ""));
+                            final Integer positiveRatingCount = Integer.parseInt(returnedValues.get("ratings").replace(",", ""));
 
-                            if (newMessagesCount > a.getMessageCount()) { // TODO: Get notifications to work when both a message and alert notification needs to be created
-                                if (newMessagesCount - a.getMessageCount() == 1) {
-                                    new Notification(a.getName() + "@" + a.getForum().getUrl(), "You have a new message", notifImage).send();
-                                } else {
-                                    new Notification(a.getName() + "@" + a.getForum().getUrl(), "You have " + (newMessagesCount - a.getMessageCount()) + " new messages", notifImage).send();
+                            if (a.getMessageCount() != null && a.getAlertCount() != null) {
+                                if (newMessagesCount > a.getMessageCount()) { // TODO: Get notifications to work when both a message and alert notification needs to be created
+                                    if (newMessagesCount - a.getMessageCount() == 1) {
+                                        new Notification(a.getName() + " @ " + a.getForum().getUrl(), "You have a new message", notifImage).send();
+                                    } else {
+                                        new Notification(a.getName() + " @ " + a.getForum().getUrl(), "You have " + (newMessagesCount - a.getMessageCount()) + " new messages", notifImage).send();
+                                    }
+                                }
+
+                                if (newAlertsCount > a.getAlertCount()) {
+                                    if (newAlertsCount - a.getAlertCount() == 1) {
+                                        new Notification(a.getName() + " @ " + a.getForum().getUrl(), "You have a new alert", notifImage).send();
+                                    } else {
+                                        new Notification(a.getName() + " @ " + a.getForum().getUrl(), "You have " + (newAlertsCount - a.getAlertCount()) + " new alerts", notifImage).send();
+                                    }
+                                }
+
+                            } else {
+
+                                if (newMessagesCount > 0) {
+                                    if (newMessagesCount > 1) {
+                                        new Notification(a.getName() + " @ " + a.getForum().getUrl(), "You have " + newMessagesCount + " new messages", notifImage).send();
+                                    }
+                                    new Notification(a.getName() + " @ " + a.getForum().getUrl(), "You have a new message", notifImage).send();
+                                }
+
+                                if (newAlertsCount > 0) {
+                                    if (newAlertsCount > 1) {
+                                        new Notification(a.getName() + " @ " + a.getForum().getUrl(), "You have " + newAlertsCount + " new alerts", notifImage).send();
+                                    }
+                                    new Notification(a.getName() + " @ " + a.getForum().getUrl(), "You have a new alert", notifImage).send();
                                 }
                             }
 
-                            if (newAlertsCount > a.getAlertCount()) {
-                                if (newAlertsCount - a.getAlertCount() == 1) {
-                                    new Notification(a.getName() + "@" + a.getForum().getUrl(), "You have a new alert", notifImage).send();
-                                } else {
-                                    new Notification(a.getName() + "@" + a.getForum().getUrl(), "You have " + (newAlertsCount - a.getAlertCount()) + " new alerts", notifImage).send();
-                                }
-                            }
                             Platform.runLater(() -> {
                                 a.setMessageCount(newMessagesCount.toString());
                                 a.setAlertCount(newAlertsCount.toString());
+                                a.setPostCount(postCount.toString());
+                                a.setPositiveRatingCount(positiveRatingCount.toString());
                             });
                         } catch (NumberFormatException e) {
+                            e.printStackTrace();
                             Platform.runLater(() -> {
                                 a.setMessageCount("N/A");
                                 a.setAlertCount("N/A");

@@ -6,6 +6,7 @@ import com.cldfire.forumnotifier.model.Forum;
 import com.cldfire.forumnotifier.util.DefaultXpaths;
 import com.cldfire.forumnotifier.util.ForumsStore;
 import com.cldfire.forumnotifier.util.LangUtils;
+import com.cldfire.forumnotifier.util.XpathUtils;
 import com.cldfire.forumnotifier.util.animations.EnumAnimationType;
 import com.cldfire.forumnotifier.util.animations.NodeAnimationUtils;
 import com.gargoylesoftware.htmlunit.BrowserVersion;
@@ -59,7 +60,9 @@ public class LoginViewController {
     private boolean doesForumExist;
     private HtmlPage twoFactorPage;
 
-    private Map<String, Object> defaultXpaths = new HashMap<>(new DefaultXpaths(Forum.ForumType.XENFORO, tempSiteUrl).get());
+
+    private XpathUtils xpathUtils;
+    private Map<String, Object> defaultXpaths = new HashMap<>(new DefaultXpaths(Forum.ForumType.XENFORO).get());
     private List<String> twoFactorLoginFormPaths = new ArrayList<>((List<String>) defaultXpaths.get("twoFactorLoginFormPaths"));
     private List<String> profileNamePaths = new ArrayList<>((List<String>) defaultXpaths.get("accountNamePaths"));
     private List<String> profileUrlPaths = new ArrayList<>((List<String>) defaultXpaths.get("accountUrlPaths"));
@@ -67,6 +70,7 @@ public class LoginViewController {
 
     public void initialize() {
         RootLayoutController.setLoginViewController(this);
+        xpathUtils = new XpathUtils();
         errorLabel.setText(LangUtils.translate("login.errorLabel"));
         url.setPromptText(LangUtils.translate("login.url"));
         validateButton.setText(LangUtils.translate("login.validate"));
@@ -97,6 +101,7 @@ public class LoginViewController {
         confirmButton.setVisible(false);
         password.setVisible(false);
         loginButton.setVisible(false);
+        errorLabel.setVisible(false);
         url.setVisible(true);
 
         url.setText("");
@@ -115,7 +120,7 @@ public class LoginViewController {
 
     private Boolean testForLoggedIn() { // TODO: Add more ways to detect that a user is logged in
         return webClient.getCookieManager().getCookies().size() > 5 || webClient.getCookieManager().getCookie("xf_user") != null || webClient.getCookieManager().getCookie("xf_user") != null;
-    } // TODO: Move utility methods to a utility class to maintain some semblance of organization
+    }
 
     public static Boolean testForCloudflare(final HtmlPage page) {
         return page.getTitleText().equalsIgnoreCase("just a moment...");
@@ -148,77 +153,12 @@ public class LoginViewController {
         }
     }
 
-    private HtmlForm checkXpathListForForm(final List<String> xpaths, final HtmlPage page) {
-        for (String x : xpaths) {
-            Object htmlElement = page.getFirstByXPath(x);
-
-            if (htmlElement != null) {
-                switch (htmlElement.getClass().getTypeName()) {
-                    case "com.gargoylesoftware.htmlunit.html.HtmlForm": {
-                        return (HtmlForm) htmlElement;
-                    }
-                }
-            }
-        }
-        return null;
-    }
-
-    public static String checkXpathListForString(final List<String> xpaths, final HtmlPage page) {
-        for (String x : xpaths) {
-            Object htmlElement = page.getFirstByXPath(x);
-
-            if (htmlElement != null) {
-                System.out.println(htmlElement.getClass().getTypeName());
-
-                switch (htmlElement.getClass().getTypeName()) {
-                    case "com.gargoylesoftware.htmlunit.html.HtmlSpan": {
-                        HtmlSpan element = (HtmlSpan) htmlElement;
-                        if (element.asText() != null) {
-                            return element.asText();
-                        }
-                    }
-
-                    case "com.gargoylesoftware.htmlunit.html.HtmlStrong": {
-                        HtmlStrong element = (HtmlStrong) htmlElement;
-                        if (element.asText() != null) {
-                            return element.asText();
-                        }
-                    }
-
-                    case "com.gargoylesoftware.htmlunit.html.HtmlDefinitionDescription": {
-                        HtmlDefinitionDescription element = (HtmlDefinitionDescription) htmlElement;
-                        if (element.asText() != null) {
-                            return element.asText();
-                        }
-                    }
-
-                    case "com.gargoylesoftware.htmlunit.html.HtmlHeader": {
-                        HtmlHeader element = (HtmlHeader) htmlElement;
-                        if (element.asText() != null) {
-                            return element.asText();
-                        }
-                    }
-
-                    case "com.gargoylesoftware.htmlunit.html.HtmlAnchor": {
-                        HtmlAnchor element = (HtmlAnchor) htmlElement;
-                        if (element.getAttribute("href") != null) {
-                            return element.getAttribute("href");
-                        } else if (element.asText() != null) {
-                            return element.asText();
-                        }
-                    }
-                }
-            }
-        }
-        return null;
-    }
-
     private String getAccountName(final String url, final List<String> xpaths) {
         final HtmlPage page;
 
         try {
             page = webClient.getPage(url);
-            return checkXpathListForString(xpaths, page);
+            return xpathUtils.checkXpathListForString(xpaths, page);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -230,7 +170,7 @@ public class LoginViewController {
 
         try {
             page = webClient.getPage(url);
-            return tempSiteUrl + "/" + checkXpathListForString(xpaths, page);
+            return tempSiteUrl + "/" + xpathUtils.checkXpathListForHref(xpaths, page);
         } catch (IOException e) {
             e.printStackTrace();
             return null;
@@ -244,31 +184,16 @@ public class LoginViewController {
 
         try {
             imageFolder = new File(ForumNotifier.APP_DIR, "account_images");
-            imageFile = new File(imageFolder, this.url.getText() + "_" + username.getText());
+            imageFile = new File(imageFolder, this.url.getText().replace("/", "").replace(".", "") + "_" + username.getText() + ".png");
 
             if (!imageFolder.exists()) {
                 imageFolder.mkdir();
             }
 
             page = webClient.getPage(url);
+            xpathUtils.checkXpathListForImage(xpaths, page).saveAs(imageFile);
 
-
-            for (String x : xpaths) {
-                Object htmlElement = page.getFirstByXPath(x);
-
-                if (htmlElement != null) {
-                    switch (htmlElement.getClass().getTypeName()) {
-                        case "com.gargoylesoftware.htmlunit.html.HtmlImage": {
-                            HtmlImage element = (HtmlImage) htmlElement;
-                            element.saveAs(imageFile);
-
-                            return imageFile.getPath();
-                        }
-                    }
-                }
-            }
-
-            return null;
+            return imageFile.getPath();
         } catch (Exception e) {
             e.printStackTrace();
             return null; // TODO: Return some default placeholder image
@@ -280,7 +205,7 @@ public class LoginViewController {
 
         HtmlPage page1;
         final HtmlForm loginForm;
-        final HtmlSubmitInput loginButton;
+        HtmlSubmitInput loginButton;
         final HtmlCheckBoxInput stayLoggedIn;
         final HtmlTextInput emailField;
         final HtmlPasswordInput passwordField;
@@ -313,7 +238,7 @@ public class LoginViewController {
         final HtmlTextInput codeField;
 
         try {
-            authForm = checkXpathListForForm(twoFactorLoginFormPaths, page);
+            authForm = xpathUtils.checkXpathListForForm(twoFactorLoginFormPaths, page);
 
             if (authForm != null) { // TODO: Tell user that form couldn't be found, prompt them to enter correct xpath
                 confirmButton = authForm.getInputByName("save");
@@ -412,6 +337,7 @@ public class LoginViewController {
                 final HtmlPage postLoginPage = loginToSite(tempSiteUrl + "/login", username.getText(), password.getText());
 
                 if (postLoginPage != null) {
+                    System.out.println(postLoginPage.getTitleText());
                     if (postLoginPage.getUrl().toString().startsWith(tempSiteUrl + "/login/two-step")) {
                         twoFactorPage = postLoginPage;
                         password.setVisible(false);
