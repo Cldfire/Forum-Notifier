@@ -40,7 +40,7 @@ public class AccountDisplayBlock {
         divider.setStroke(Color.web("#303030"));
         divider.setStrokeLineCap(StrokeLineCap.ROUND);
         divider.setTranslateX(25);
-        divider.setTranslateY(100.5);
+        divider.setTranslateY(104);
 
 
         accountName = new Label("...");

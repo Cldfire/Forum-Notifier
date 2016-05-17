@@ -8,7 +8,6 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
-import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
@@ -26,24 +25,21 @@ public class NodeAnimationUtils {
                         .concat(" transparent;")
         );
 
-        bindObject.focusedProperty().addListener(new ChangeListener<Boolean>() {
-            @Override
-            public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
-                if (newValue) {
-                    Timeline fade = new Timeline(
-                            new KeyFrame(Duration.seconds(0), new KeyValue(color, fromColor, Interpolator.LINEAR)),
-                            new KeyFrame(Duration.seconds(duration * 0.25), new KeyValue(color, toColor, Interpolator.LINEAR)),
-                            new KeyFrame(Duration.seconds(duration * 0.75), new KeyValue(color, toColor, Interpolator.LINEAR))
-                    );
-                    fade.play();
-                } else {
-                    Timeline fade = new Timeline(
-                            new KeyFrame(Duration.seconds(0), new KeyValue(color, toColor, Interpolator.LINEAR)),
-                            new KeyFrame(Duration.seconds(duration * 0.25), new KeyValue(color, fromColor, Interpolator.LINEAR)),
-                            new KeyFrame(Duration.seconds(duration * 0.75), new KeyValue(color, fromColor, Interpolator.LINEAR))
-                    );
-                    fade.play();
-                }
+        bindObject.focusedProperty().addListener((ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) -> {
+            if (newValue) {
+                Timeline fade = new Timeline(
+                        new KeyFrame(Duration.seconds(0), new KeyValue(color, fromColor, Interpolator.LINEAR)),
+                        new KeyFrame(Duration.seconds(duration * 0.25), new KeyValue(color, toColor, Interpolator.LINEAR)),
+                        new KeyFrame(Duration.seconds(duration * 0.75), new KeyValue(color, toColor, Interpolator.LINEAR))
+                );
+                fade.play();
+            } else {
+                Timeline fade = new Timeline(
+                        new KeyFrame(Duration.seconds(0), new KeyValue(color, toColor, Interpolator.LINEAR)),
+                        new KeyFrame(Duration.seconds(duration * 0.25), new KeyValue(color, fromColor, Interpolator.LINEAR)),
+                        new KeyFrame(Duration.seconds(duration * 0.75), new KeyValue(color, fromColor, Interpolator.LINEAR))
+                );
+                fade.play();
             }
         });
     }
@@ -51,11 +47,9 @@ public class NodeAnimationUtils {
     private static StringProperty createColorStringProperty(final ObjectProperty<Color> color) {
         final StringProperty colorStringProperty = new SimpleStringProperty();
         setColorStringFromColor(colorStringProperty, color);
-        color.addListener(new ChangeListener<Color>() {
-            @Override
-            public void changed(ObservableValue<? extends Color> observableValue, Color oldColor, Color newColor) {
+
+        color.addListener((ObservableValue<? extends Color> observableValue, Color oldColor, Color newColor) -> {
                 setColorStringFromColor(colorStringProperty, color);
-            }
         });
 
         return colorStringProperty;

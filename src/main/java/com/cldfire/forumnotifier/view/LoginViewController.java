@@ -14,11 +14,9 @@ import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.html.*;
 import com.gargoylesoftware.htmlunit.util.Cookie;
 import javafx.application.Platform;
+import javafx.beans.binding.StringBinding;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.PasswordField;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.paint.Color;
 
 import java.io.File;
@@ -35,6 +33,14 @@ public class LoginViewController {
     private final WebClient webClient = new WebClient(BrowserVersion.CHROME);
     private final ExecutorService executor = Executors.newFixedThreadPool(2);
 
+    @FXML
+    private Label softwareConfirmLabel;
+    @FXML
+    private Button softwareConfirmButton;
+    @FXML
+    private ChoiceBox softwareBox;
+    @FXML
+    private Label validateLabel;
     @FXML
     private TextField url;
     @FXML
@@ -55,19 +61,20 @@ public class LoginViewController {
     private ForumNotifier forumNotifier;
     private static RootLayoutController rootLayoutController;
 
+    private Forum.ForumType tempForumType;
     private String tempSiteUrl;
     private String tempConnProtocol;
     private boolean doesForumExist;
     private HtmlPage twoFactorPage;
 
-
     private XpathUtils xpathUtils;
-    private Map<String, Object> defaultXpaths = new HashMap<>(new DefaultXpaths(Forum.ForumType.XENFORO).get());
-    private List<String> twoFactorLoginFormPaths = new ArrayList<>((List<String>) defaultXpaths.get("twoFactorLoginFormPaths"));
-    private List<String> profileNamePaths = new ArrayList<>((List<String>) defaultXpaths.get("accountNamePaths"));
-    private List<String> profileUrlPaths = new ArrayList<>((List<String>) defaultXpaths.get("accountUrlPaths"));
-    private List<String> profilePicPaths = new ArrayList<>((List<String>) defaultXpaths.get("accountPicPaths"));
+    private Map<String, Object> defaultXpaths;
+    private List<String> twoFactorLoginFormPaths;
+    private List<String> profileNamePaths;
+    private List<String> profileUrlPaths;
+    private List<String> profilePicPaths;
 
+    @FXML
     public void initialize() {
         RootLayoutController.setLoginViewController(this);
         xpathUtils = new XpathUtils();
@@ -80,10 +87,33 @@ public class LoginViewController {
         authCode.setPromptText(LangUtils.translate("login.authCode"));
         confirmButton.setText(LangUtils.translate("login.confirm"));
 
+        softwareBox.getItems().addAll("XenForo");
+
         NodeAnimationUtils.bindFromToAnimation(EnumAnimationType.COLOR_FADE, url, 0.7, new Color(0.3098039215686275, 0.3098039215686275, 0.3098039215686275, 1), new Color(0, 1, 0.9254901960784314, 1));
         NodeAnimationUtils.bindFromToAnimation(EnumAnimationType.COLOR_FADE, username, 0.7, new Color(0.3098039215686275, 0.3098039215686275, 0.3098039215686275, 1), new Color(0, 1, 0.9254901960784314, 1));
         NodeAnimationUtils.bindFromToAnimation(EnumAnimationType.COLOR_FADE, password, 0.7, new Color(0.3098039215686275, 0.3098039215686275, 0.3098039215686275, 1), new Color(0, 1, 0.9254901960784314, 1));
         NodeAnimationUtils.bindFromToAnimation(EnumAnimationType.COLOR_FADE, authCode, 0.7, new Color(0.3098039215686275, 0.3098039215686275, 0.3098039215686275, 1), new Color(0, 1, 0.9254901960784314, 1));
+
+
+        validateLabel.textProperty().bind(new StringBinding() {
+            {
+                bind(url.textProperty());
+            }
+
+            @Override
+            protected String computeValue() {
+                if (url.getText().startsWith("http:") || url.getText().startsWith("https:")) {
+                    validateButton.setDisable(true);
+                    return "Remove connection protocol";
+                }
+                else if (url.getText().endsWith("/")) {
+                    validateButton.setDisable(true);
+                    return "Remove the forward slash at the end";
+                }
+                validateButton.setDisable(false);
+                return "";
+            }
+        });
     }
 
     public void setForumNotifier(final ForumNotifier forumNotifier) {
@@ -95,15 +125,18 @@ public class LoginViewController {
     }
 
     public void resetForNewLogin() {
-        validateButton.setVisible(true);
+        softwareBox.setVisible(true);
+        softwareConfirmButton.setVisible(true);
+        validateButton.setVisible(false);
         username.setVisible(false);
         authCode.setVisible(false);
         confirmButton.setVisible(false);
         password.setVisible(false);
         loginButton.setVisible(false);
         errorLabel.setVisible(false);
-        url.setVisible(true);
+        url.setVisible(false);
 
+        softwareBox.getSelectionModel().clearSelection();
         url.setText("");
         username.setText("");
         password.setText("");
@@ -255,34 +288,67 @@ public class LoginViewController {
         }
     }
 
-    private Boolean validateSite(final String url) { // TODO: Have this throwExceptionOnFailingStatusCode and then check for cloudflare if it's a 503, rather than ignoring all other status codes
+    private Boolean validateSite(final String url, final Forum.ForumType forumType) { // TODO: Have this throwExceptionOnFailingStatusCode and then check for cloudflare if it's a 503, rather than ignoring all other status codes
         webClient.getOptions().setCssEnabled(false);
         webClient.getOptions().setJavaScriptEnabled(false);
         webClient.getOptions().setThrowExceptionOnFailingStatusCode(false);
 
         final HtmlPage page;
-        final HtmlHtml forumType;
+        final HtmlHtml htmlToCheck;
 
         try {
             page = webClient.getPage(url);
 
             if (testForCloudflare(page)) { // TODO: Tell user that Cloudflare is causing the delay
                 webClient.getCookieManager().addCookie(completeCloudflareBrowserCheck(url));
-                validateSite(url);
+                validateSite(url, forumType);
             }
 
-            forumType = page.getFirstByXPath("/html[@id='XenForo']");
+            switch (forumType) {
+                case XENFORO: {
+                    htmlToCheck = page.getFirstByXPath("/html[@id='XenForo']");
+                    return htmlToCheck.getId().equals("XenForo");
+                }
+            }
 
-            return forumType.getId().equals("XenForo");
         } catch (Exception e) {
             e.printStackTrace();
-            return false;
         }
+        return false;
     }
 
     //private boolean doesAccountExist() { // TODO: < ----
 
     //}
+
+    @FXML
+    private void handleSoftwareSelect() {
+        errorLabel.setVisible(false);
+
+        if (softwareBox.getSelectionModel().getSelectedItem() != null) {
+            softwareBox.setVisible(false);
+            softwareConfirmButton.setVisible(false);
+            softwareConfirmLabel.setVisible(false);
+            url.setVisible(true);
+            validateButton.setVisible(true);
+
+            switch ((String) softwareBox.getSelectionModel().getSelectedItem()) {
+                case "XenForo": tempForumType = Forum.ForumType.XENFORO;
+                    break;
+            }
+
+            defaultXpaths = new HashMap<>(new DefaultXpaths(tempForumType).get());
+            profilePicPaths = new ArrayList<>((List<String>) defaultXpaths.get("accountPicPaths"));
+            profileUrlPaths = new ArrayList<>((List<String>) defaultXpaths.get("accountUrlPaths"));
+            profileNamePaths = new ArrayList<>((List<String>) defaultXpaths.get("accountNamePaths"));
+            twoFactorLoginFormPaths = new ArrayList<>((List<String>) defaultXpaths.get("twoFactorLoginFormPaths"));
+        }
+        else {
+            softwareConfirmLabel.setVisible(false);
+            errorLabel.setVisible(true);
+            errorLabel.setText("Please select something");
+        }
+    }
 
     @FXML
     private void handleValidate() {
@@ -293,7 +359,7 @@ public class LoginViewController {
             Runnable validateRunnable = () -> {
                 errorLabel.setVisible(false);
                 try {
-                    if (validateSite("https://" + url.getText())) {
+                    if (validateSite("https://" + url.getText(), tempForumType)) {
                         validateButton.setVisible(false);
                         url.setVisible(false);
                         password.setVisible(true);
@@ -302,7 +368,7 @@ public class LoginViewController {
 
                         tempConnProtocol = "https";
                         tempSiteUrl = tempConnProtocol + "://" + url.getText();
-                    } else if (validateSite("http://" + url.getText())) {
+                    } else if (validateSite("http://" + url.getText(), tempForumType)) {
                         validateButton.setVisible(false);
                         url.setVisible(false);
                         password.setVisible(true);
@@ -373,7 +439,7 @@ public class LoginViewController {
                         }
 
                         if (!doesForumExist) {
-                            Forum addForum = ForumsStore.createForum(url.getText(), Forum.ForumType.XENFORO, tempConnProtocol);
+                            Forum addForum = ForumsStore.createForum(url.getText(), tempForumType, tempConnProtocol);
                             Account addAccount = ForumsStore.createAccount(webClient.getCookieManager().getCookies(), getAccountName(tempSiteUrl, profileNamePaths), getProfileUrl(tempSiteUrl, profileUrlPaths), getAccountPic(getProfileUrl(tempSiteUrl, profileUrlPaths), profilePicPaths), defaultXpaths);
 
                             addForum.addAccount(addAccount);
@@ -441,7 +507,7 @@ public class LoginViewController {
                     }
 
                     if (!doesForumExist) {
-                        Forum addForum = ForumsStore.createForum(url.getText(), Forum.ForumType.XENFORO, tempConnProtocol);
+                        Forum addForum = ForumsStore.createForum(url.getText(), tempForumType, tempConnProtocol);
                         Account addAccount = ForumsStore.createAccount(webClient.getCookieManager().getCookies(), getAccountName(tempSiteUrl, profileNamePaths), getProfileUrl(tempSiteUrl, profileUrlPaths), getAccountPic(getProfileUrl(tempSiteUrl, profileUrlPaths), profilePicPaths), defaultXpaths);
 
                         addForum.addAccount(addAccount);

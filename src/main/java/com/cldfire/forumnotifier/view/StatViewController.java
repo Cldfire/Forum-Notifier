@@ -2,6 +2,7 @@ package com.cldfire.forumnotifier.view;
 
 import com.cldfire.forumnotifier.model.Account;
 import com.cldfire.forumnotifier.model.AccountDisplay;
+import com.cldfire.forumnotifier.model.DetailedDisplay;
 import com.cldfire.forumnotifier.util.ForumsStore;
 import com.cldfire.forumnotifier.util.XpathUtils;
 import com.cldfire.forumnotifier.util.notifications.Notification;
@@ -65,7 +66,8 @@ public class StatViewController {
 
         accountOverview.setCellFactory((ListView<Account> l) -> new AccountDisplay());
         accountOverview.setItems(accountBlocks);
-        checkEverythingAtFixedRate();
+        detailedView.getChildren().add(new DetailedDisplay().get());
+        //checkEverythingAtFixedRate();
     }
 
     private String getXenToken(final Account account) { // TODO: Re-write this if it ever gets used
