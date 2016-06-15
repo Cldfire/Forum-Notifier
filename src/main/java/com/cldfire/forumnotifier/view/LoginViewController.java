@@ -1,13 +1,13 @@
 package com.cldfire.forumnotifier.view;
 
 import com.cldfire.forumnotifier.ForumNotifier;
-import com.cldfire.forumnotifier.model.Account;
-import com.cldfire.forumnotifier.model.Forum;
-import com.cldfire.forumnotifier.util.DefaultXpaths;
+import com.cldfire.forumnotifier.model.*;
+import com.cldfire.forumnotifier.util.EnumXpathType;
 import com.cldfire.forumnotifier.util.ForumsStore;
 import com.cldfire.forumnotifier.util.LangUtils;
 import com.cldfire.forumnotifier.util.XpathUtils;
-import com.cldfire.forumnotifier.util.animations.EnumAnimationType;
+import com.cldfire.forumnotifier.util.animations.EnumColorFadeAnimationType;
+import com.cldfire.forumnotifier.util.animations.MoveAnimation;
 import com.cldfire.forumnotifier.util.animations.NodeAnimationUtils;
 import com.gargoylesoftware.htmlunit.BrowserVersion;
 import com.gargoylesoftware.htmlunit.WebClient;
@@ -15,24 +15,26 @@ import com.gargoylesoftware.htmlunit.html.*;
 import com.gargoylesoftware.htmlunit.util.Cookie;
 import javafx.application.Platform;
 import javafx.beans.binding.StringBinding;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.paint.Color;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class LoginViewController {
-
+    private ObservableList<XpathDisplayBlock> xpathDisplayBlocks;
     private final WebClient webClient = new WebClient(BrowserVersion.CHROME);
     private final ExecutorService executor = Executors.newFixedThreadPool(2);
 
+    @FXML
+    private AnchorPane anchorPane;
     @FXML
     private Label softwareConfirmLabel;
     @FXML
@@ -57,6 +59,10 @@ public class LoginViewController {
     private Button confirmButton;
     @FXML
     private Label errorLabel;
+    @FXML
+    private Button xpathEditButton;
+
+    private ListView<XpathDisplayBlock> xpathDisplay;
 
     private ForumNotifier forumNotifier;
     private static RootLayoutController rootLayoutController;
@@ -68,16 +74,24 @@ public class LoginViewController {
     private HtmlPage twoFactorPage;
 
     private XpathUtils xpathUtils;
-    private Map<String, Object> defaultXpaths;
-    private List<String> twoFactorLoginFormPaths;
-    private List<String> profileNamePaths;
-    private List<String> profileUrlPaths;
-    private List<String> profilePicPaths;
+    AccountXpaths accountXpaths;
 
     @FXML
     public void initialize() {
         RootLayoutController.setLoginViewController(this);
         xpathUtils = new XpathUtils();
+
+        xpathDisplay = new ListView<>();
+        xpathDisplay.setCellFactory((ListView<XpathDisplayBlock> l) -> new XpathDisplay());
+        xpathDisplay.setTranslateX(400);
+        xpathDisplay.setTranslateY(10);
+        xpathDisplay.setPrefSize(400, 420);
+        xpathDisplay.getStyleClass().add("list-cell");
+        xpathDisplay.setVisible(false);
+        xpathDisplay.setEditable(false);
+        xpathDisplay.setFocusTraversable(false);
+        anchorPane.getChildren().add(xpathDisplay);
+
         errorLabel.setText(LangUtils.translate("login.errorLabel"));
         url.setPromptText(LangUtils.translate("login.url"));
         validateButton.setText(LangUtils.translate("login.validate"));
@@ -87,12 +101,14 @@ public class LoginViewController {
         authCode.setPromptText(LangUtils.translate("login.authCode"));
         confirmButton.setText(LangUtils.translate("login.confirm"));
 
-        softwareBox.getItems().addAll("XenForo");
+        for (Forum.ForumType value : Forum.ForumType.values()) {
+            softwareBox.getItems().add(value.getName());
+        }
 
-        NodeAnimationUtils.bindFromToAnimation(EnumAnimationType.COLOR_FADE, url, 0.7, new Color(0.3098039215686275, 0.3098039215686275, 0.3098039215686275, 1), new Color(0, 1, 0.9254901960784314, 1));
-        NodeAnimationUtils.bindFromToAnimation(EnumAnimationType.COLOR_FADE, username, 0.7, new Color(0.3098039215686275, 0.3098039215686275, 0.3098039215686275, 1), new Color(0, 1, 0.9254901960784314, 1));
-        NodeAnimationUtils.bindFromToAnimation(EnumAnimationType.COLOR_FADE, password, 0.7, new Color(0.3098039215686275, 0.3098039215686275, 0.3098039215686275, 1), new Color(0, 1, 0.9254901960784314, 1));
-        NodeAnimationUtils.bindFromToAnimation(EnumAnimationType.COLOR_FADE, authCode, 0.7, new Color(0.3098039215686275, 0.3098039215686275, 0.3098039215686275, 1), new Color(0, 1, 0.9254901960784314, 1));
+        NodeAnimationUtils.bindColorFadeAnimation(EnumColorFadeAnimationType.COLOR_FADE, url, 0.7, new Color(0.3098039215686275, 0.3098039215686275, 0.3098039215686275, 1), new Color(0, 1, 0.9254901960784314, 1));
+        NodeAnimationUtils.bindColorFadeAnimation(EnumColorFadeAnimationType.COLOR_FADE, username, 0.7, new Color(0.3098039215686275, 0.3098039215686275, 0.3098039215686275, 1), new Color(0, 1, 0.9254901960784314, 1));
+        NodeAnimationUtils.bindColorFadeAnimation(EnumColorFadeAnimationType.COLOR_FADE, password, 0.7, new Color(0.3098039215686275, 0.3098039215686275, 0.3098039215686275, 1), new Color(0, 1, 0.9254901960784314, 1));
+        NodeAnimationUtils.bindColorFadeAnimation(EnumColorFadeAnimationType.COLOR_FADE, authCode, 0.7, new Color(0.3098039215686275, 0.3098039215686275, 0.3098039215686275, 1), new Color(0, 1, 0.9254901960784314, 1));
 
 
         validateLabel.textProperty().bind(new StringBinding() {
@@ -102,7 +118,8 @@ public class LoginViewController {
 
             @Override
             protected String computeValue() {
-                if (url.getText().startsWith("http:") || url.getText().startsWith("https:")) {
+                errorLabel.setVisible(false);
+                if (url.getText().startsWith("http://") || url.getText().startsWith("https://")) {
                     validateButton.setDisable(true);
                     return "Remove connection protocol";
                 }
@@ -125,8 +142,11 @@ public class LoginViewController {
     }
 
     public void resetForNewLogin() {
+        resetLayout();
+
         softwareBox.setVisible(true);
         softwareConfirmButton.setVisible(true);
+        softwareConfirmLabel.setVisible(true);
         validateButton.setVisible(false);
         username.setVisible(false);
         authCode.setVisible(false);
@@ -135,6 +155,8 @@ public class LoginViewController {
         loginButton.setVisible(false);
         errorLabel.setVisible(false);
         url.setVisible(false);
+        xpathEditButton.setVisible(false);
+        xpathDisplay.setVisible(false);
 
         softwareBox.getSelectionModel().clearSelection();
         url.setText("");
@@ -217,7 +239,7 @@ public class LoginViewController {
 
         try {
             imageFolder = new File(ForumNotifier.APP_DIR, "account_images");
-            imageFile = new File(imageFolder, this.url.getText().replace("/", "").replace(".", "") + "_" + username.getText() + ".png");
+            imageFile = new File(imageFolder, this.url.getText().replace("/", "").replace(".", "") + "_" + username.getText() + ".img");
 
             if (!imageFolder.exists()) {
                 imageFolder.mkdir();
@@ -236,25 +258,26 @@ public class LoginViewController {
     private HtmlPage loginToSite(final String url, final String email, final String password) {
         webClient.getOptions().setThrowExceptionOnFailingStatusCode(true);
 
-        HtmlPage page1;
+        final HtmlPage page;
         final HtmlForm loginForm;
-        HtmlSubmitInput loginButton;
+        final HtmlSubmitInput loginButton;
         final HtmlCheckBoxInput stayLoggedIn;
-        final HtmlTextInput emailField;
+        final HtmlTextInput usernameField;
         final HtmlPasswordInput passwordField;
 
 
         try {
-            page1 = webClient.getPage(url);
+            page = webClient.getPage(url);
 
-            loginForm = (HtmlForm) page1.getElementById("pageLogin");
-            loginButton = loginForm.getInputByValue("Log in");
-            stayLoggedIn = loginForm.getInputByName("remember");
-            emailField = loginForm.getInputByName("login");
-            passwordField = loginForm.getInputByName("password");
+            loginForm = xpathUtils.checkXpathListForForm(accountXpaths.getUserPassLoginForm(), page);
+
+            loginButton = xpathUtils.getSubmitInputFromForm(accountXpaths.getLoginButtonValue(), loginForm);
+            stayLoggedIn = xpathUtils.getCheckboxInputFromForm(accountXpaths.getStayLoggedInFieldName(), loginForm);
+            usernameField = xpathUtils.getTextInputFromForm(accountXpaths.getUsernameFieldName(), loginForm);
+            passwordField = xpathUtils.getPasswordInputFromForm(accountXpaths.getPasswordFieldName(), loginForm);
 
             stayLoggedIn.setChecked(true);
-            emailField.setValueAttribute(email);
+            usernameField.setValueAttribute(email);
             passwordField.setValueAttribute(password);
 
             return loginButton.click();
@@ -265,24 +288,22 @@ public class LoginViewController {
     }
 
     private void loginTwoFactorAuth(final String code, final HtmlPage page) {
-        final HtmlForm authForm;
+        final HtmlForm twoFactorForm;
         final HtmlSubmitInput confirmButton;
         final HtmlCheckBoxInput trustDevice;
         final HtmlTextInput codeField;
 
         try {
-            authForm = xpathUtils.checkXpathListForForm(twoFactorLoginFormPaths, page);
+            twoFactorForm = xpathUtils.checkXpathListForForm(accountXpaths.getTwoFactorLoginForm(), page);
 
-            if (authForm != null) { // TODO: Tell user that form couldn't be found, prompt them to enter correct xpath
-                confirmButton = authForm.getInputByName("save");
-                codeField = authForm.getInputByName("code");
-                trustDevice = authForm.getInputByName("trust");
+            confirmButton = xpathUtils.getSubmitInputFromForm(accountXpaths.getConfirmTwoFactorButtonName(), twoFactorForm);
+            codeField = xpathUtils.getTextInputFromForm(accountXpaths.getTwoFactorCodeFieldName(), twoFactorForm);
+            trustDevice = xpathUtils.getCheckboxInputFromForm(accountXpaths.getTrustTwoFactorLoginFieldName(), twoFactorForm);
 
-                codeField.setValueAttribute(code);
-                trustDevice.setChecked(true);
+            codeField.setValueAttribute(code);
+            trustDevice.setChecked(true);
 
-                confirmButton.click();
-            }
+            confirmButton.click();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -317,9 +338,55 @@ public class LoginViewController {
         return false;
     }
 
-    //private boolean doesAccountExist() { // TODO: < ----
+    private void resetLayout() {
+        password.setLayoutX(300);
+        username.setLayoutX(300);
+        loginButton.setLayoutX(370);
+        authCode.setLayoutX(300);
+        confirmButton.setLayoutX(365);
+    }
+
+    //private boolean doesAccountExist() { // TODO: Implement this and make sure that the account the user is trying to add does not already exist
 
     //}
+
+    @FXML
+    private void handleXpathEdit() {
+        xpathEditButton.setVisible(false);
+        if (password.isVisible()) {
+            new MoveAnimation(password, 0.1, password.getLayoutX() - 180, password.getLayoutY()).play();
+            new MoveAnimation(username, 0.1, username.getLayoutX() - 180, username.getLayoutY()).play();
+            new MoveAnimation(loginButton, 0.1, loginButton.getLayoutX() - 180, loginButton.getLayoutY()).play();
+
+            xpathDisplayBlocks = FXCollections.observableArrayList();
+            xpathDisplayBlocks.addAll(
+                    new XpathDisplayBlock(EnumXpathType.USERPASSLOGINFORM, accountXpaths, accountXpaths.getUserPassLoginForm().get(0)),
+                    new XpathDisplayBlock(),
+                    new XpathDisplayBlock(EnumXpathType.USERNAMEFIELDNAME, accountXpaths, accountXpaths.getUsernameFieldName().get(0)),
+                    new XpathDisplayBlock(EnumXpathType.PASSWORDFIELDNAME, accountXpaths, accountXpaths.getPasswordFieldName().get(0)),
+                    new XpathDisplayBlock(EnumXpathType.LOGINBUTTONVALUE, accountXpaths, accountXpaths.getLoginButtonValue().get(0)),
+                    new XpathDisplayBlock(EnumXpathType.STAYLOGGEDINFIELDNAME, accountXpaths, accountXpaths.getStayLoggedInFieldName().get(0))
+            );
+            xpathDisplay.setItems(xpathDisplayBlocks);
+            xpathDisplay.setVisible(true);
+        }
+
+        if (authCode.isVisible()) {
+            new MoveAnimation(authCode, 0.1, authCode.getLayoutX() - 180, authCode.getLayoutY()).play();
+            new MoveAnimation(confirmButton, 0.1, confirmButton.getLayoutX() - 180, confirmButton.getLayoutY()).play();
+
+            xpathDisplayBlocks = FXCollections.observableArrayList();
+            xpathDisplayBlocks.addAll(
+                    new XpathDisplayBlock(EnumXpathType.TWOFACTORLOGINFORM, accountXpaths, accountXpaths.getTwoFactorLoginForm().get(0)),
+                    new XpathDisplayBlock(),
+                    new XpathDisplayBlock(EnumXpathType.TWOFACTORCODEFIELDNAME, accountXpaths, accountXpaths.getTwoFactorCodeFieldName().get(0)),
+                    new XpathDisplayBlock(EnumXpathType.CONFIRMTWOFACTORBUTTONNAME, accountXpaths, accountXpaths.getConfirmTwoFactorButtonName().get(0)),
+                    new XpathDisplayBlock(EnumXpathType.TRUSTTWOFACTORLOGINFIELDNAME, accountXpaths, accountXpaths.getTrustTwoFactorLoginFieldName().get(0))
+            );
+            xpathDisplay.setItems(xpathDisplayBlocks);
+            xpathDisplay.setVisible(true);
+        }
+    }
 
     @FXML
     private void handleSoftwareSelect() {
@@ -337,11 +404,7 @@ public class LoginViewController {
                     break;
             }
 
-            defaultXpaths = new HashMap<>(new DefaultXpaths(tempForumType).get());
-            profilePicPaths = new ArrayList<>((List<String>) defaultXpaths.get("accountPicPaths"));
-            profileUrlPaths = new ArrayList<>((List<String>) defaultXpaths.get("accountUrlPaths"));
-            profileNamePaths = new ArrayList<>((List<String>) defaultXpaths.get("accountNamePaths"));
-            twoFactorLoginFormPaths = new ArrayList<>((List<String>) defaultXpaths.get("twoFactorLoginFormPaths"));
+            accountXpaths = new AccountXpaths(Forum.ForumType.XENFORO);
         }
         else {
             softwareConfirmLabel.setVisible(false);
@@ -365,6 +428,7 @@ public class LoginViewController {
                         password.setVisible(true);
                         username.setVisible(true);
                         loginButton.setVisible(true);
+                        xpathEditButton.setVisible(true);
 
                         tempConnProtocol = "https";
                         tempSiteUrl = tempConnProtocol + "://" + url.getText();
@@ -374,6 +438,7 @@ public class LoginViewController {
                         password.setVisible(true);
                         username.setVisible(true);
                         loginButton.setVisible(true);
+                        xpathEditButton.setVisible(true);
 
                         tempConnProtocol = "http";
                         tempSiteUrl = tempConnProtocol + "://" + url.getText();
@@ -406,10 +471,13 @@ public class LoginViewController {
                     System.out.println(postLoginPage.getTitleText());
                     if (postLoginPage.getUrl().toString().startsWith(tempSiteUrl + "/login/two-step")) {
                         twoFactorPage = postLoginPage;
+
                         password.setVisible(false);
                         username.setVisible(false);
                         loginButton.setVisible(false);
                         errorLabel.setVisible(false);
+                        xpathDisplay.setVisible(false);
+                        xpathEditButton.setVisible(true);
                         confirmButton.setVisible(true);
                         authCode.setVisible(true);
 
@@ -422,7 +490,7 @@ public class LoginViewController {
                                 System.out.println(f.getUrl());
                                 if (f.getUrl().equalsIgnoreCase(url.getText())) {
                                     System.out.println("found forum");
-                                    Account addAccount = ForumsStore.createAccount(webClient.getCookieManager().getCookies(), getAccountName(tempSiteUrl, profileNamePaths), getProfileUrl(tempSiteUrl, profileUrlPaths), getAccountPic(getProfileUrl(tempSiteUrl, profileUrlPaths), profilePicPaths), defaultXpaths);
+                                    Account addAccount = ForumsStore.createAccount(webClient.getCookieManager().getCookies(), getAccountName(tempSiteUrl, accountXpaths.getAccountName()), getProfileUrl(tempSiteUrl, accountXpaths.getAccountUrl()), getAccountPic(getProfileUrl(tempSiteUrl, accountXpaths.getAccountUrl()), accountXpaths.getAccountPic()), accountXpaths);
 
                                     f.addAccount(addAccount);
                                     ForumsStore.saveForums();
@@ -440,7 +508,7 @@ public class LoginViewController {
 
                         if (!doesForumExist) {
                             Forum addForum = ForumsStore.createForum(url.getText(), tempForumType, tempConnProtocol);
-                            Account addAccount = ForumsStore.createAccount(webClient.getCookieManager().getCookies(), getAccountName(tempSiteUrl, profileNamePaths), getProfileUrl(tempSiteUrl, profileUrlPaths), getAccountPic(getProfileUrl(tempSiteUrl, profileUrlPaths), profilePicPaths), defaultXpaths);
+                            Account addAccount = ForumsStore.createAccount(webClient.getCookieManager().getCookies(), getAccountName(tempSiteUrl, accountXpaths.getAccountName()), getProfileUrl(tempSiteUrl, accountXpaths.getAccountUrl()), getAccountPic(getProfileUrl(tempSiteUrl, accountXpaths.getAccountUrl()), accountXpaths.getAccountPic()), accountXpaths);
 
                             addForum.addAccount(addAccount);
                             ForumsStore.addForum(addForum);
@@ -490,7 +558,7 @@ public class LoginViewController {
                             System.out.println(f.getUrl());
                             if (f.getUrl().equalsIgnoreCase(url.getText())) {
                                 System.out.println("found forum");
-                                Account addAccount = ForumsStore.createAccount(webClient.getCookieManager().getCookies(), getAccountName(tempSiteUrl, profileNamePaths), getProfileUrl(tempSiteUrl, profileUrlPaths), getAccountPic(getProfileUrl(tempSiteUrl, profileUrlPaths), profilePicPaths), defaultXpaths);
+                                Account addAccount = ForumsStore.createAccount(webClient.getCookieManager().getCookies(), getAccountName(tempSiteUrl, accountXpaths.getAccountName()), getProfileUrl(tempSiteUrl, accountXpaths.getAccountUrl()), getAccountPic(getProfileUrl(tempSiteUrl, accountXpaths.getAccountUrl()), accountXpaths.getAccountPic()), accountXpaths);
 
                                 f.addAccount(addAccount);
                                 ForumsStore.saveForums();
@@ -508,7 +576,7 @@ public class LoginViewController {
 
                     if (!doesForumExist) {
                         Forum addForum = ForumsStore.createForum(url.getText(), tempForumType, tempConnProtocol);
-                        Account addAccount = ForumsStore.createAccount(webClient.getCookieManager().getCookies(), getAccountName(tempSiteUrl, profileNamePaths), getProfileUrl(tempSiteUrl, profileUrlPaths), getAccountPic(getProfileUrl(tempSiteUrl, profileUrlPaths), profilePicPaths), defaultXpaths);
+                        Account addAccount = ForumsStore.createAccount(webClient.getCookieManager().getCookies(), getAccountName(tempSiteUrl, accountXpaths.getAccountName()), getProfileUrl(tempSiteUrl, accountXpaths.getAccountUrl()), getAccountPic(getProfileUrl(tempSiteUrl, accountXpaths.getAccountUrl()), accountXpaths.getAccountPic()), accountXpaths);
 
                         addForum.addAccount(addAccount);
                         ForumsStore.addForum(addForum);

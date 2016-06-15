@@ -2,7 +2,7 @@
 
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.AnchorPane?>
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="450.0" prefWidth="800.0" styleClass="background" stylesheets="@../stylesheets/insertnamehere.css" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.cldfire.forumnotifier.view.LoginViewController">
+<AnchorPane fx:id="anchorPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="450.0" prefWidth="800.0" styleClass="background" stylesheets="@../stylesheets/insertnamehere.css" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.cldfire.forumnotifier.view.LoginViewController">
     <children>
         <TextField fx:id="username" layoutX="300.0" layoutY="215.0" prefWidth="200.0" promptText="username" visible="false" />
         <PasswordField fx:id="password" layoutX="300.0" layoutY="255.0" prefWidth="200.0" promptText="password" visible="false" />
@@ -16,5 +16,7 @@
       <ChoiceBox fx:id="softwareBox" layoutX="325.0" layoutY="215.0" prefWidth="150.0" />
       <Label fx:id="softwareConfirmLabel" alignment="CENTER" contentDisplay="CENTER" layoutX="200.0" layoutY="186.0" prefWidth="400.0" text="Select forum software:" textAlignment="CENTER" />
       <Button fx:id="softwareConfirmButton" alignment="CENTER" contentDisplay="CENTER" layoutX="366.0" layoutY="305.0" mnemonicParsing="false" onAction="#handleSoftwareSelect" text="Confirm" textAlignment="CENTER" />
+      <Button layoutX="-103.0" layoutY="-25.0" mnemonicParsing="false" text="Button" />
+      <Button layoutX="734.0" layoutY="411.0" mnemonicParsing="false" onAction="#handleXpathEdit" text="Edit xpaths" visible="false" AnchorPane.bottomAnchor="10.0" AnchorPane.rightAnchor="10.0" fx:id="xpathEditButton" />
     </children>
 </AnchorPane>

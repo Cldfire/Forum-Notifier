@@ -2,6 +2,7 @@ package com.cldfire.forumnotifier.view;
 
 import com.cldfire.forumnotifier.model.Account;
 import com.cldfire.forumnotifier.model.AccountDisplay;
+import com.cldfire.forumnotifier.model.AccountXpaths;
 import com.cldfire.forumnotifier.model.DetailedDisplay;
 import com.cldfire.forumnotifier.util.ForumsStore;
 import com.cldfire.forumnotifier.util.XpathUtils;
@@ -10,7 +11,6 @@ import com.gargoylesoftware.htmlunit.BrowserVersion;
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.html.HtmlInput;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
-import com.gargoylesoftware.htmlunit.util.Cookie;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -22,7 +22,6 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -67,8 +66,56 @@ public class StatViewController {
         accountOverview.setCellFactory((ListView<Account> l) -> new AccountDisplay());
         accountOverview.setItems(accountBlocks);
         detailedView.getChildren().add(new DetailedDisplay().get());
-        //checkEverythingAtFixedRate();
+        checkEverythingAtFixedRate();
     }
+
+    /*
+    private Set<Image> getFollowingImages(final Account a, final HtmlPage page) {
+        WebClient webClient = new WebClient(BrowserVersion.CHROME);
+        webClient.getOptions().setCssEnabled(false);
+        webClient.getOptions().setJavaScriptEnabled(false);
+
+        a.getCookies().forEach(c -> webClient.getCookieManager().addCookie(c));
+
+        final HtmlOrderedList followingList;
+        final Set<Image> returnSet = new HashSet<>();
+
+        try {
+            final Pattern pattern = Pattern.compile("'(.*?)'");
+
+            followingList = page.getFirstByXPath("//*[@id='content']/div/div/div[2]/div/div[1]/div[4]/div[1]/div/div[1]/ol");
+
+            followingList.getChildElements().forEach((node) -> {
+                final HtmlListItem item = (HtmlListItem) node;
+                final HtmlAnchor imageAnchor = (HtmlAnchor) item.getFirstElementChild();
+                final HtmlSpan imageSpan = (HtmlSpan) imageAnchor.getFirstChild();
+                String imageUrl = null;
+                Matcher matcher;
+
+                matcher = pattern.matcher(imageSpan.getAttribute("style"));
+                if (matcher.find()) {
+                    imageUrl = matcher.group(1);
+
+                    if (!imageUrl.startsWith("http://") && !imageUrl.startsWith("https://")) {
+                        imageUrl = a.getForum().getProtocol() + "://" + a.getForum().getUrl() + "/" + imageUrl;
+                    }
+
+                    try {
+                        returnSet.add(SwingFXUtils.toFXImage(ImageIO.read(webClient.getPage(imageUrl).getWebResponse().getContentAsStream()), null));
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
+
+            return returnSet;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+    */
 
     private String getXenToken(final Account account) { // TODO: Re-write this if it ever gets used
         final WebClient webClient = new WebClient(BrowserVersion.CHROME);
@@ -93,48 +140,22 @@ public class StatViewController {
         return null;
     }
 
-    private Map<String, String> getEverything(final Account a) {
-        final WebClient webClient = new WebClient(BrowserVersion.CHROME);
-        webClient.getOptions().setCssEnabled(false);
-        webClient.getOptions().setJavaScriptEnabled(false);
-        webClient.getOptions().setThrowExceptionOnFailingStatusCode(false);
-
-        HtmlPage page;
+    private Map<String, String> getEverything(final Account a, final HtmlPage page) {
         Map<String, String> values = new HashMap<>();
 
-        // feed the WebClient so that it does what we want it to
-        System.out.println(a.getCookies());
-        a.getCookies().forEach(c -> webClient.getCookieManager().addCookie(c));
-
         try {
-            Map<String, Object> xpaths = new HashMap<>(a.getAccountXpathsMap());
-            String url = a.getProfileUrl(); // TODO: Don't use one URL
+            AccountXpaths xpaths = a.getAccountXpaths();
 
-            page = webClient.getPage(url);
-
-            if (LoginViewController.testForCloudflare(page)) { // TODO: Tell user that Cloudflare is causing the delay
-                Cookie cookie = LoginViewController.completeCloudflareBrowserCheck(url);
-                webClient.getCookieManager().addCookie(cookie);
-                a.addCookie(cookie);
-                System.out.println(a.getCookies());
-                page = webClient.getPage(url);
-            }
-
-
-            webClient.close();
-
-            values.put("messages", xpathUtils.checkXpathListForString((List<String>) xpaths.get("messagePaths"), page));
-            values.put("alerts", xpathUtils.checkXpathListForString((List<String>) xpaths.get("alertPaths"), page));
-            values.put("posts", xpathUtils.checkXpathListForString((List<String>) xpaths.get("postPaths"), page));
-            values.put("ratings", xpathUtils.checkXpathListForString((List<String>) xpaths.get("ratingPaths"), page));
+            values.put("messages", xpathUtils.checkXpathListForString(xpaths.getMessages(), page));
+            values.put("alerts", xpathUtils.checkXpathListForString(xpaths.getAlerts(), page));
+            values.put("posts", xpathUtils.checkXpathListForString(xpaths.getPosts(), page));
+            values.put("ratings", xpathUtils.checkXpathListForString(xpaths.getRatings(), page));
 
             return values;
         } catch (Exception e) {
             e.printStackTrace();
 
         }
-        webClient.close();
-        values.put("N/A", "N/A");
         return values;
     }
 
@@ -142,71 +163,102 @@ public class StatViewController {
         Runnable getEverythingRunnable = () -> {
             ForumsStore.forums.forEach(f -> {
                 System.out.println("Forum list had something");
-                System.out.println("Size: " + ForumsStore.forums.size());
 
                 f.getAccounts().forEach(a -> {
                     System.out.println("There were accounts for that site");
-                    System.out.println(a.getName());
+                    System.out.println("Handling " + a.getName() + " @ " + a.getForum().getUrl());
+
+                    final Map<String, String> returnedValues;
+                    final Integer newMessagesCount;
+                    final Integer newAlertsCount;
+                    final Integer postCount;
+                    final Integer positiveRatingCount;
+
+                    final WebClient webClient = new WebClient(BrowserVersion.CHROME);
+                    webClient.getOptions().setCssEnabled(false);
+                    webClient.getOptions().setJavaScriptEnabled(false);
+                    HtmlPage page = null;
+
+                    a.getCookies().forEach(c -> webClient.getCookieManager().addCookie(c));
+
                     try {
-                        System.out.println("Handling " + a.getName() + " @ " + a.getForum().getUrl());
-                        final Map<String, String> returnedValues = new HashMap<>(getEverything(a));
-
-                        try {
-                            final Integer newMessagesCount = Integer.parseInt(returnedValues.get("messages"));
-                            final Integer newAlertsCount = Integer.parseInt(returnedValues.get("alerts"));
-                            final Integer postCount = Integer.parseInt(returnedValues.get("posts").replace(",", ""));
-                            final Integer positiveRatingCount = Integer.parseInt(returnedValues.get("ratings").replace(",", ""));
-
-                            if (a.getMessageCount() != null && a.getAlertCount() != null) {
-                                if (newMessagesCount > a.getMessageCount()) { // TODO: Get notifications to work when both a message and alert notification needs to be created
-                                    if (newMessagesCount - a.getMessageCount() == 1) {
-                                        new Notification(a.getName() + " @ " + a.getForum().getUrl(), "You have a new message", notifImage).send();
-                                    } else {
-                                        new Notification(a.getName() + " @ " + a.getForum().getUrl(), "You have " + (newMessagesCount - a.getMessageCount()) + " new messages", notifImage).send();
-                                    }
-                                }
-
-                                if (newAlertsCount > a.getAlertCount()) {
-                                    if (newAlertsCount - a.getAlertCount() == 1) {
-                                        new Notification(a.getName() + " @ " + a.getForum().getUrl(), "You have a new alert", notifImage).send();
-                                    } else {
-                                        new Notification(a.getName() + " @ " + a.getForum().getUrl(), "You have " + (newAlertsCount - a.getAlertCount()) + " new alerts", notifImage).send();
-                                    }
-                                }
-
-                            } else {
-
-                                if (newMessagesCount > 0) {
-                                    if (newMessagesCount > 1) {
-                                        new Notification(a.getName() + " @ " + a.getForum().getUrl(), "You have " + newMessagesCount + " new messages", notifImage).send();
-                                    }
-                                    new Notification(a.getName() + " @ " + a.getForum().getUrl(), "You have a new message", notifImage).send();
-                                }
-
-                                if (newAlertsCount > 0) {
-                                    if (newAlertsCount > 1) {
-                                        new Notification(a.getName() + " @ " + a.getForum().getUrl(), "You have " + newAlertsCount + " new alerts", notifImage).send();
-                                    }
-                                    new Notification(a.getName() + " @ " + a.getForum().getUrl(), "You have a new alert", notifImage).send();
-                                }
-                            }
-
-                            Platform.runLater(() -> {
-                                a.setMessageCount(newMessagesCount.toString());
-                                a.setAlertCount(newAlertsCount.toString());
-                                a.setPostCount(postCount.toString());
-                                a.setPositiveRatingCount(positiveRatingCount.toString());
-                            });
-                        } catch (NumberFormatException e) {
-                            e.printStackTrace();
-                            Platform.runLater(() -> {
-                                a.setMessageCount("N/A");
-                                a.setAlertCount("N/A");
-                            });
-                        }
-                    } catch (Exception e) {
+                        page = webClient.getPage(a.getProfileUrl());
+                    } catch (IOException e) {
                         e.printStackTrace();
                     }
+
+                    if (page != null) {
+                        returnedValues = new HashMap<>(getEverything(a, page));
+                    } else {
+                        returnedValues = new HashMap<>();
+                    }
+
+                    // TODO: If something returns null here there's obviously a problem, do something about that
+                    if (returnedValues.get("messages") != null) {
+                        newMessagesCount = Integer.parseInt(returnedValues.get("messages"));
+                    } else {
+                        newMessagesCount = -20;
+                    }
+
+                    if (returnedValues.get("alerts") != null) {
+                        newAlertsCount = Integer.parseInt(returnedValues.get("alerts"));
+                    } else {
+                        newAlertsCount = -20;
+                    }
+
+                    if (returnedValues.get("posts") != null) {
+                        postCount = Integer.parseInt(returnedValues.get("posts").replace(",", ""));
+                    } else {
+                        postCount = -20;
+                    }
+
+                    if (returnedValues.get("ratings") != null) {
+                        positiveRatingCount = Integer.parseInt(returnedValues.get("ratings").replace(",", ""));
+                    } else {
+                        positiveRatingCount = -20;
+                    }
+
+
+                    if (a.getMessageCount() != null && a.getAlertCount() != null) {
+                        if (newMessagesCount > a.getMessageCount()) { // TODO: Get notifications to work when both a message and alert notification needs to be created
+                            if (newMessagesCount - a.getMessageCount() == 1) {
+                                new Notification(a.getName() + " @ " + a.getForum().getUrl(), "You have a new message", notifImage).send();
+                            } else {
+                                new Notification(a.getName() + " @ " + a.getForum().getUrl(), "You have " + (newMessagesCount - a.getMessageCount()) + " new messages", notifImage).send();
+                            }
+                        }
+
+                        if (newAlertsCount > a.getAlertCount()) {
+                            if (newAlertsCount - a.getAlertCount() == 1) {
+                                new Notification(a.getName() + " @ " + a.getForum().getUrl(), "You have a new alert", notifImage).send();
+                            } else {
+                                new Notification(a.getName() + " @ " + a.getForum().getUrl(), "You have " + (newAlertsCount - a.getAlertCount()) + " new alerts", notifImage).send();
+                            }
+                        }
+
+                    } else {
+
+                        if (newMessagesCount > 0) {
+                            if (newMessagesCount > 1) {
+                                new Notification(a.getName() + " @ " + a.getForum().getUrl(), "You have " + newMessagesCount + " new messages", notifImage).send();
+                            }
+                            new Notification(a.getName() + " @ " + a.getForum().getUrl(), "You have a new message", notifImage).send();
+                        }
+
+                        if (newAlertsCount > 0) {
+                            if (newAlertsCount > 1) {
+                                new Notification(a.getName() + " @ " + a.getForum().getUrl(), "You have " + newAlertsCount + " new alerts", notifImage).send();
+                            }
+                            new Notification(a.getName() + " @ " + a.getForum().getUrl(), "You have a new alert", notifImage).send();
+                        }
+                    }
+
+                    Platform.runLater(() -> {
+                        a.setMessageCount(newMessagesCount.toString());
+                        a.setAlertCount(newAlertsCount.toString());
+                        a.setPostCount(postCount.toString());
+                        a.setPositiveRatingCount(positiveRatingCount.toString());
+                    });
                 });
             });
             System.out.println("Ran checker");

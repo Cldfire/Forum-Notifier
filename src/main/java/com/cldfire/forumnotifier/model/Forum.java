@@ -46,6 +46,7 @@ public class Forum {
     }
 
     public Map<String, Object> getForumData() {
+        System.out.println("yo");
         Map<String, Object> forumData = new HashMap<>();
         List<Map<String, Object>> accountData = new ArrayList<>();
 
@@ -75,7 +76,7 @@ public class Forum {
             ad.put("cookies", cd);
             ad.put("profileUrl", a.getProfileUrl());
             ad.put("picFilePath", a.getPicFilePath());
-            ad.put("xpathMaps", a.getAccountXpathsMap());
+            ad.put("xpathsMap", a.getAccountXpaths().getXpathsMap());
 
             accountData.add(ad);
         });

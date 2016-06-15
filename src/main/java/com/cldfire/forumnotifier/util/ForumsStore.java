@@ -2,6 +2,7 @@ package com.cldfire.forumnotifier.util;
 
 import com.cldfire.forumnotifier.ForumNotifier;
 import com.cldfire.forumnotifier.model.Account;
+import com.cldfire.forumnotifier.model.AccountXpaths;
 import com.cldfire.forumnotifier.model.Forum;
 import com.gargoylesoftware.htmlunit.util.Cookie;
 import com.google.gson.Gson;
@@ -50,6 +51,7 @@ public class ForumsStore { // TODO: Add things, idk what to add
                     accountData.forEach(ad -> {
                         Set<Cookie> cookies = new HashSet<>();
                         List<LinkedTreeMap<String, Object>> cookieDataMap = new ArrayList<>((List<LinkedTreeMap<String, Object>>) ad.get("cookies"));
+                        Map<String, List<String>> xpathsMap = new HashMap<>((Map<String, List<String>>) ad.get("xpathsMap"));
 
                         cookieDataMap.forEach(c -> {
                             SimpleDateFormat formatter = new SimpleDateFormat("MMM dd, yyyy HH:mm:ss a");
@@ -68,7 +70,30 @@ public class ForumsStore { // TODO: Add things, idk what to add
                             }
                         });
 
-                        addForum.addAccount(createAccount(cookies, (String) ad.get("name"), (String) ad.get("profileUrl"), (String) ad.get("picFilePath"), (Map<String, Object>) ad.get("xpathMaps")));
+                        // TODO: This is stupid, error-prone and should not be this much typing. Rework this system
+                        AccountXpaths accountXpaths = new AccountXpaths(
+                                xpathsMap.get("userPassLoginForm"),
+                                xpathsMap.get("twoFactorLoginForm"),
+                                xpathsMap.get("passwordFieldName"),
+                                xpathsMap.get("usernameFieldName"),
+                                xpathsMap.get("stayLoggedInFieldName"),
+                                xpathsMap.get("loginButtonValue"),
+                                xpathsMap.get("twoFactorCodeFieldName"),
+                                xpathsMap.get("trustTwoFactorLoginFieldName"),
+                                xpathsMap.get("confirmTwoFactorButtonName"),
+                                xpathsMap.get("accountUrl"),
+                                xpathsMap.get("accountPic"),
+                                xpathsMap.get("accountName"),
+                                xpathsMap.get("messages"),
+                                xpathsMap.get("alerts"),
+                                xpathsMap.get("ratings"),
+                                xpathsMap.get("posts"),
+                                xpathsMap.get("followingList"),
+                                xpathsMap.get("followerList"),
+                                xpathsMap.get("followerCount")
+                        );
+
+                        addForum.addAccount(createAccount(cookies, (String) ad.get("name"), (String) ad.get("profileUrl"), (String) ad.get("picFilePath"), accountXpaths));
                     });
                     forums.add(addForum);
                 });
@@ -122,14 +147,14 @@ public class ForumsStore { // TODO: Add things, idk what to add
         return new Forum(returnForumData);
     }
 
-    public static Account createAccount(Set<Cookie> cookies, String name, String profileUrl, String picFilePath, Map<String, Object> xpathMaps) {
+    public static Account createAccount(Set<Cookie> cookies, String name, String profileUrl, String picFilePath, AccountXpaths xpathsMap) {
         Map<String, Object> returnAccountData = new HashMap<>();
 
         returnAccountData.put("cookies", cookies);
         returnAccountData.put("name", name);
         returnAccountData.put("profileUrl", profileUrl);
         returnAccountData.put("picFilePath", picFilePath);
-        returnAccountData.put("xpathMaps", xpathMaps);
+        returnAccountData.put("xpathsMap", xpathsMap);
 
         return new Account(returnAccountData);
     }

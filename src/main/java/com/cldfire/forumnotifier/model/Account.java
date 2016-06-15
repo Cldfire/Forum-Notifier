@@ -1,6 +1,5 @@
 package com.cldfire.forumnotifier.model;
 
-import com.cldfire.forumnotifier.util.DefaultXpaths;
 import com.cldfire.forumnotifier.util.ForumsStore;
 import com.gargoylesoftware.htmlunit.util.Cookie;
 import javafx.beans.property.ObjectProperty;
@@ -9,7 +8,6 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.scene.image.Image;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -18,13 +16,13 @@ public class Account { // TODO: Make sure all this becomes thread safe at some p
     private final StringProperty alertCountProperty;
     private final StringProperty messageCountProperty;
     private final StringProperty postCountProperty;
-    private final StringProperty postiveRatingCountProperty;
+    private final StringProperty positiveRatingCountProperty;
     private final ObjectProperty<Image> accountPic;
 
     private Set<Cookie> cookies;
     private String profileUrl;
     private String picFilePath;
-    private Map<String, Object> xpathMaps;
+    private AccountXpaths xpathMaps;
 
     private AccountDisplayBlock displayBlock;
 
@@ -33,7 +31,7 @@ public class Account { // TODO: Make sure all this becomes thread safe at some p
         alertCountProperty = new SimpleStringProperty();
         messageCountProperty = new SimpleStringProperty();
         postCountProperty = new SimpleStringProperty();
-        postiveRatingCountProperty = new SimpleStringProperty();
+        positiveRatingCountProperty = new SimpleStringProperty();
         this.accountPic = new SimpleObjectProperty<>(new Image("file:" + accountData.get("picFilePath")));
 
         this.cookies = (Set<Cookie>) accountData.get("cookies");
@@ -41,9 +39,9 @@ public class Account { // TODO: Make sure all this becomes thread safe at some p
         picFilePath = (String) accountData.get("picFilePath");
 
         try {
-            xpathMaps = new HashMap<>((Map<String, Object>) accountData.get("xpathMaps"));
+            xpathMaps = new AccountXpaths((AccountXpaths) accountData.get("xpathsMap"));
         } catch (NullPointerException e) {
-            xpathMaps = new DefaultXpaths(Forum.ForumType.XENFORO).get();
+            xpathMaps = new AccountXpaths(getForum().getType());
         }
 
         displayBlock = new AccountDisplayBlock();
@@ -103,12 +101,12 @@ public class Account { // TODO: Make sure all this becomes thread safe at some p
     }
 
     public void setPositiveRatingCount(String positiveRatingCount) {
-        this.postiveRatingCountProperty.set(positiveRatingCount);
+        this.positiveRatingCountProperty.set(positiveRatingCount);
         displayBlock.setPositiveRatingCount(positiveRatingCount);
     }
 
     public String getPositiveRatingCount() {
-        return postiveRatingCountProperty.get();
+        return positiveRatingCountProperty.get();
     }
 
     public Image getAccountPic() {
@@ -148,7 +146,7 @@ public class Account { // TODO: Make sure all this becomes thread safe at some p
         this.picFilePath = picFilePath;
     }
 
-    public Map<String, Object> getAccountXpathsMap() {
+    public AccountXpaths getAccountXpaths() {
         return xpathMaps;
     }
 

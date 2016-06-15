@@ -2,6 +2,7 @@ package com.cldfire.forumnotifier.model;
 
 import com.cldfire.forumnotifier.util.EnumGoogleIcon;
 import javafx.scene.control.Label;
+import javafx.scene.control.Tooltip;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
@@ -14,8 +15,8 @@ import javafx.scene.text.TextFlow;
 
 public class AccountDisplayBlock {
 
-    private Pane blockPane;
-    private Pane backing;
+    private AnchorPane blockPane;
+    private AnchorPane backing;
     private Rectangle divider;
     private Label accountName;
     private Label forumUrl;
@@ -25,6 +26,8 @@ public class AccountDisplayBlock {
     private Text positiveRatingCount;
     private TextFlow accountStatus;
     private ImageView accountPic;
+
+    private Label errorWarning;
 
     public AccountDisplayBlock() {
 
@@ -92,12 +95,26 @@ public class AccountDisplayBlock {
         accountPic.setFitWidth(80);
         accountPic.setPreserveRatio(true);
 
-        blockPane.getChildren().add(backing);
-        blockPane.getChildren().add(divider);
-        blockPane.getChildren().add(accountName);
-        blockPane.getChildren().add(forumUrl);
-        blockPane.getChildren().add(accountStatus);
-        blockPane.getChildren().add(accountPic);
+        errorWarning = new Label(EnumGoogleIcon.WARNING.get());
+        errorWarning.setStyle("-fx-font-family: 'Material Icons'; -fx-font-size: 24; -fx-text-fill: #ff5757;");
+        errorWarning.setVisible(false);
+        errorWarning.setTranslateX(325);
+        errorWarning.setTranslateY(10);
+
+
+        blockPane.getChildren().addAll(
+                backing,
+                divider,
+                accountName,
+                forumUrl,
+                accountStatus,
+                accountPic,
+                errorWarning
+        );
+
+        backing.setOnMouseClicked(event -> {
+            handleBackingClick();
+        });
     }
 
     public Pane get() {
@@ -152,5 +169,16 @@ public class AccountDisplayBlock {
 
     public void setPostCount(String postCount) {
         this.postCount.setText("      " + postCount);
+    }
+
+    public void showErrorWarning(String error) {
+        errorWarning.setVisible(true);
+        Tooltip tooltip = new Tooltip(error);
+        errorWarning.setTooltip(tooltip);
+    } // TODO: Text doesn't display properly
+
+
+    private void handleBackingClick() {
+        System.out.println("I was clicked");
     }
 }

@@ -4,12 +4,15 @@ import com.cldfire.forumnotifier.ForumNotifier;
 import com.cldfire.forumnotifier.util.EnumGoogleIcon;
 import com.cldfire.forumnotifier.util.LangUtils;
 import javafx.fxml.FXML;
+import javafx.scene.control.Label;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 
 public class RootLayoutController {
     @FXML
-    TextFlow addAccount;
+    private TextFlow addAccount;
+    @FXML
+    private Label settings;
 
     private ForumNotifier forumNotifier;
     private static LoginViewController loginViewController;
@@ -28,6 +31,9 @@ public class RootLayoutController {
         addText.setTranslateY(-6);
         addText.setTranslateX(1);
         addAccount.getChildren().addAll(addIcon, addText);
+
+        settings.setText(EnumGoogleIcon.SETTINGS.get());
+        settings.setStyle("-fx-font-family: 'Material Icons'; -fx-font-size: 24; -fx-fill: #7c7c7c;");
     }
 
     public void setForumNotifier(ForumNotifier forumNotifier) {
@@ -76,6 +82,21 @@ public class RootLayoutController {
     private void handleMouseExitAdd() {
         addIcon.setStyle("-fx-font-family: 'Material Icons'; -fx-font-size: 24; -fx-fill: #7c7c7c;");
         addText.setStyle("-fx-font-family: 'Segoe UI'; -fx-font-size: 16; -fx-fill: #7c7c7c;");
+    }
+
+    @FXML
+    private void handleSettingsClicked() {
+
+    }
+
+    @FXML
+    private void handleMouseEnterSettings() {
+
+    }
+
+    @FXML
+    private void handleMouseExitSettings() {
+
     }
 
     public void changeButtonToAdd() {

@@ -15,12 +15,12 @@ import javafx.util.Duration;
 
 public class NodeAnimationUtils {
 
-    public static void bindFromToAnimation(final EnumAnimationType animation, final Region bindObject, final Double duration, final Color fromColor, final Color toColor) {
+    public static void bindColorFadeAnimation(final EnumColorFadeAnimationType animationType, final Region bindObject, final Double duration, final Color fromColor, final Color toColor) {
         final ObjectProperty<Color> color = new SimpleObjectProperty<>(fromColor);
         final StringProperty colorStringProperty = createColorStringProperty(color);
 
         bindObject.styleProperty().bind(
-                new SimpleStringProperty(animation.getStyleProperty() + ": transparent transparent ")
+                new SimpleStringProperty(animationType.getStyleProperty() + ": transparent transparent ")
                         .concat(colorStringProperty)
                         .concat(" transparent;")
         );
@@ -35,8 +35,8 @@ public class NodeAnimationUtils {
                 fade.play();
             } else {
                 Timeline fade = new Timeline(
-                        new KeyFrame(Duration.seconds(0), new KeyValue(color, toColor, Interpolator.LINEAR)),
                         new KeyFrame(Duration.seconds(duration * 0.25), new KeyValue(color, fromColor, Interpolator.LINEAR)),
+                        new KeyFrame(Duration.seconds(0), new KeyValue(color, toColor, Interpolator.LINEAR)),
                         new KeyFrame(Duration.seconds(duration * 0.75), new KeyValue(color, fromColor, Interpolator.LINEAR))
                 );
                 fade.play();

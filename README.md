@@ -2,7 +2,7 @@
 
 Keep tabs on all those forum sites / accounts. Sends you desktop notifications for new alerts, messages and \<whatever else\>, allows you to change the signature, profile image and more for all (or specific) accounts, displays (and tracks) account stats and more, all in one easy-to-use, clean interface. In addition, a mobile version (for Android and possibly iOS) is a future possibility. If you have any other ideas or suggestions, please share them [here](https://github.com/Cldfire/Forum-Notifier/issues/26).
 
-Please note that this project is currrently in the early stages of development.
+Please note that this project is currently in the early stages of development.
 
 ##Supported Software / Sites:
 General software types:
@@ -18,18 +18,20 @@ We also intend to support some sites that aren't really considered "forums":
 - [Apple Discussions](https://discussions.apple.com/welcome) (PLANNED)
 - More to come (suggestions welcome)
 
+If a site you'd like to use this with isn't on the list, don't fear; you can change xpaths to elements from within the program, meaning this works with practically everything.
+
 ##Screenshot(s)
 (not final)
 
 ![alt text](http://i.imgur.com/yGjTfEo.png "Stat View")
 
-##Features
-- Notifies user for all notifications
-- Displays statistics
-- Update / view account information from one place
-- News feed / alert feed for all (or specific) accounts
-- Easy to PR support for any site using software we've already built infrastructure for
+##Planned Features
+- Get desktop notifications for new web notifications
+- View statistics for all your different accounts
+- Update account information (signature, contact info, avatar and more) from one, convenient location
+- Change xpaths to various elements from the program itself, allowing it to be used with almost any site
 - Works with any number of forums and accounts
+- Helpful tools for site staff (mainly XenForo at first)
 - More coming
 
 ##Downloads & Support
@@ -40,8 +42,6 @@ We also intend to support some sites that aren't really considered "forums":
 
 ##Contributions
 Contributions are greatly appreciated; if you'd like to help out, join [our Discord server](https://discord.gg/010FelNLz605nQi3u) for discussion.
-
-A guide on how to PR support for another site will be coming soon (tm).
 
 
 
