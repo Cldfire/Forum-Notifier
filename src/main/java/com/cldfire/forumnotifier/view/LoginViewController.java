@@ -121,15 +121,15 @@ public class LoginViewController {
                 errorLabel.setVisible(false);
                 if (url.getText().startsWith("http://") || url.getText().startsWith("https://")) {
                     validateButton.setDisable(true);
-                    return "Please remove the transfer protocol.";
+                    return "Please remove the transfer protocol";
                 }
                 else if (url.getText().endsWith("/")) {
                     validateButton.setDisable(true);
-                    return "Please remove the forward slash at the end.";
+                    return "Please remove the forward slash at the end";
                 }
                 else if(!url.getText().isEmpty() && !url.getText().matches("^(([a-zA-Z]{1})|([a-zA-Z]{1}[a-zA-Z]{1})|([a-zA-Z]{1}[0-9]{1})|([0-9]{1}[a-zA-Z]{1})|([a-zA-Z0-9][a-zA-Z0-9-_]{1,61}[a-zA-Z0-9]))\\.([a-zA-Z]{2,6}|[a-zA-Z0-9-]{2,30}\\.[a-zA-Z]{2,3})$")){
                     validateButton.setDisable(true);
-                    return "Please enter a valid domain.";
+                    return "Please enter a valid domain";
                 }
                 validateButton.setDisable(false);
                 return "";
