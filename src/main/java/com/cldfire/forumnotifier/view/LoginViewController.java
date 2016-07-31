@@ -127,6 +127,10 @@ public class LoginViewController {
                     validateButton.setDisable(true);
                     return "Remove the forward slash at the end";
                 }
+                else if(!url.getText().isEmpty() && !url.getText().matches("^(([a-zA-Z]{1})|([a-zA-Z]{1}[a-zA-Z]{1})|([a-zA-Z]{1}[0-9]{1})|([0-9]{1}[a-zA-Z]{1})|([a-zA-Z0-9][a-zA-Z0-9-_]{1,61}[a-zA-Z0-9]))\\.([a-zA-Z]{2,6}|[a-zA-Z0-9-]{2,30}\\.[a-zA-Z]{2,3})$")){
+                    validateButton.setDisable(true);
+                    return "Please enter a valid domain.";
+                }
                 validateButton.setDisable(false);
                 return "";
             }
