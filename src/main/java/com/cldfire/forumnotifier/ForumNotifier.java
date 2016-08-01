@@ -36,6 +36,7 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
@@ -131,6 +132,7 @@ public class ForumNotifier extends Application { // Project started April 1st, 2
 
         this.primaryStage = primaryStage;
         this.primaryStage.setTitle(LangUtils.translate("window.title"));
+        this.primaryStage.getIcons().add(new Image("file:src/main/resources/images/notification-bell.png"));
 
         initRootLayout();
         loadStatView();
