@@ -179,6 +179,6 @@ public class AccountDisplayBlock {
 
 
     private void handleBackingClick() {
-        System.out.println("I was clicked");
+        System.out.println("User box was clicked.");
     }
 }
