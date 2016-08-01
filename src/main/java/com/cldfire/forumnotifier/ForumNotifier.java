@@ -31,12 +31,15 @@ import com.cldfire.forumnotifier.util.Settings;
 import com.cldfire.forumnotifier.view.LoginViewController;
 import com.cldfire.forumnotifier.view.RootLayoutController;
 import javafx.application.Application;
+import javafx.application.Platform;
+import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 
 import java.io.File;
 import java.io.IOException;
@@ -133,5 +136,14 @@ public class ForumNotifier extends Application { // Project started April 1st, 2
         loadStatView();
         loadLoginView();
         showStatView();
+        
+        this.primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
+            @Override
+            public void handle(WindowEvent t) {
+            	System.out.println("Forum-Notifier is now closing.");
+                Platform.exit();
+                System.exit(0);
+            }
+        });
     }
 }
